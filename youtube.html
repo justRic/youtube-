@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>YouTube</title>
+<style>
+/*=========================== tokens ===========================*/
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 Roboto,"Segoe UI",Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;overflow-y:scroll;scrollbar-gutter:stable}
+:root{
+--bg:#0f0f0f;--text:#f1f1f1;--text-2:#aaaaaa;--border:#303030;
+--chip:#272727;--chip-hover:#3f3f3f;--hover:#272727;
+--search-bg:#121212;--btn:#222222;--btn-hover:#303030;
+--desc:#272727;--menu:#282828;--sk:#1f1f1f;--sk2:#2b2b2b;
+--focus:#3ea6ff;--shadow:0 16px 40px rgba(0,0,0,.6);
+}
+[data-theme=light]{
+--bg:#ffffff;--text:#0f0f0f;--text-2:#606060;--border:#d3d3d3;
+--chip:#f2f2f2;--chip-hover:#e5e5e5;--hover:#f2f2f2;
+--search-bg:#ffffff;--btn:#f8f8f8;--btn-hover:#f0f0f0;
+--desc:#f2f2f2;--menu:#ffffff;--sk:#e9e9e9;--sk2:#f4f4f4;
+--focus:#065fd4;--shadow:0 16px 40px rgba(0,0,0,.18);
+}
+svg{display:block;flex:none}
+button{font-family:inherit;cursor:pointer;color:inherit;background:none;border:none}
+input{font-family:inherit}
+img{max-width:100%}
+::selection{background:#3ea6ff55}
+/*=========================== header ===========================*/
+.masthead{position:fixed;inset:0 0 auto 0;height:56px;z-index:80;display:flex;align-items:center;gap:8px;padding:0 16px;background:var(--bg)}
+.mh-left{display:flex;align-items:center;gap:4px;flex:none}
+.mh-center{display:flex;align-items:center;gap:8px;flex:1 1 auto;justify-content:center;min-width:0;padding:0 8px}
+.mh-right{display:flex;align-items:center;gap:8px;flex:none;justify-content:flex-end}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--text)}
+.icon-btn:hover{background:var(--hover)}
+.icon-btn.sm{width:36px;height:36px}
+.logo{display:flex;align-items:center;gap:3px;text-decoration:none;padding:0 6px 0 4px;position:relative}
+.logo-mark{width:30px;height:21px}
+.logo-word{font-size:20px;font-weight:600;letter-spacing:-1.1px;line-height:20px}
+.logo-cc{position:absolute;top:-3px;right:0;font-size:9px;line-height:9px;letter-spacing:0;color:var(--text-2)}
+.search-form{display:flex;align-items:center;gap:8px;width:100%;max-width:716px}
+.search-field{display:flex;align-items:center;flex:1 1 auto;height:40px;background:var(--search-bg);border:1px solid var(--border);border-right:0;border-radius:20px 0 0 20px;padding:0 6px 0 14px;min-width:0}
+.search-field:focus-within{border-color:var(--focus);box-shadow:inset 0 0 0 1px var(--focus)}
+.search-field svg{width:20px;height:20px;color:var(--text-2);margin-right:8px}
+.search-field input{flex:1;min-width:0;border:none;outline:none;background:transparent;color:var(--text);font-size:16px;padding:0}
+.search-field input::placeholder{color:var(--text-2)}
+.search-btn{width:64px;height:40px;border:1px solid var(--border);border-radius:0 20px 20px 0;background:var(--btn);display:grid;place-items:center;flex:none}
+.search-btn:hover{background:var(--btn-hover)}
+.mic-btn{width:40px;height:40px;border-radius:50%;background:var(--chip);display:grid;place-items:center;flex:none}
+.mic-btn:hover{background:var(--chip-hover)}
+.pill-btn{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:18px;background:var(--chip);font-weight:500;font-size:14px;white-space:nowrap}
+.pill-btn:hover{background:var(--chip-hover)}
+.avatar-btn{width:32px;height:32px;border-radius:50%;background:#7d4bd1;color:#fff;font-weight:600;font-size:14px;display:grid;place-items:center;flex:none}
+.bell{position:relative}
+.bell::after{content:"";position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:#f33;border:2px solid var(--bg)}
+.icon-btn svg,.nav-item svg,.pill-btn svg,.action-pill svg,.pg-btn svg,.search-btn svg,.mic-btn svg,.search-field svg,.sub-btn svg{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+/*=========================== sidebar ===========================*/
+.sidebar{position:fixed;top:56px;bottom:0;left:0;width:240px;padding:12px 12px 24px;background:var(--bg);overflow-y:auto;overflow-x:hidden;z-index:70;scrollbar-width:thin;scrollbar-color:var(--chip) transparent}
+.sidebar::-webkit-scrollbar{width:8px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--chip);border-radius:4px}
+.sidebar:hover::-webkit-scrollbar-thumb{background:var(--chip-hover)}
+.nav-section{display:flex;flex-direction:column;gap:1px}
+.nav-item{display:flex;align-items:center;gap:24px;width:100%;height:40px;padding:0 12px;border-radius:10px;font-size:14px;text-align:left;white-space:nowrap;overflow:hidden;color:var(--text)}
+.nav-item:hover{background:var(--hover)}
+.nav-item.active{background:var(--chip);font-weight:500}
+.nav-item .label{overflow:hidden;text-overflow:ellipsis}
+.nav-title{display:flex;align-items:center;gap:4px;padding:6px 12px 6px;font-size:15px;font-weight:500}
+.nav-title svg{width:18px;height:18px}
+.nav-avatar{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:600;color:#fff;flex:none;overflow:hidden}
+.nav-avatar img{width:100%;height:100%;object-fit:cover}
+.nav-divider{height:1px;background:var(--border);margin:12px 0}
+.side-footer{padding:16px 12px 0;font-size:12px;line-height:18px;color:var(--text-2)}
+.side-footer b{display:block;margin-top:16px;font-weight:400;color:#717171;font-size:11px}
+/* mini rail */
+body[data-nav=mini] .sidebar{width:72px;padding:4px 4px 16px}
+body[data-nav=mini] .nav-item{flex-direction:column;gap:6px;height:74px;padding:0 2px;font-size:10px;line-height:14px;justify-content:center;text-align:center;white-space:normal}
+body[data-nav=mini] .nav-item svg{width:24px;height:24px}
+body[data-nav=mini] .mini-hide{display:none!important}
+body[data-nav=hidden] .sidebar{display:none}
+/*=========================== main / chips ===========================*/
+.main{margin-left:240px;padding-top:56px;min-height:100vh}
+body[data-nav=mini] .main{margin-left:72px}
+body[data-nav=hidden] .main{margin-left:0}
+@media (max-width:791px){.main{margin-left:0!important}}
+.chips{position:sticky;top:56px;z-index:50;display:flex;gap:12px;padding:12px 24px;background:var(--bg);overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{height:32px;padding:0 12px;border-radius:8px;background:var(--chip);font-size:14px;font-weight:500;white-space:nowrap;flex:none}
+.chip:hover{background:var(--chip-hover)}
+.chip.active{background:var(--text);color:var(--bg)}
+/*=========================== grid / cards ===========================*/
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:40px 16px;padding:8px 24px 48px;align-content:start}
+@media (max-width:1100px){.grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:26px 16px;padding:8px 16px 40px}}
+@media (max-width:560px){.grid{grid-template-columns:1fr;gap:22px}}
+.card{display:flex;flex-direction:column;gap:12px;min-width:0;cursor:pointer;border-radius:12px}
+.thumb{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:var(--sk)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .badges{position:absolute;right:8px;bottom:8px;display:flex;gap:4px}
+.dur{background:rgba(0,0,0,.8);color:#fff;font-size:12px;font-weight:500;line-height:12px;padding:3px 4px;border-radius:4px;letter-spacing:.2px}
+.badge-live{background:#f33;color:#fff;font-size:11px;font-weight:600;padding:3px 5px;border-radius:4px;text-transform:uppercase}
+.badge-cc{background:rgba(0,0,0,.8);color:#fff;font-size:11px;font-weight:600;padding:3px 4px;border-radius:4px}
+.card-body{display:flex;gap:12px;align-items:flex-start}
+.avatar{position:relative;width:36px;height:36px;border-radius:50%;flex:none;overflow:hidden;display:grid;place-items:center;color:#fff;font-size:15px;font-weight:600;line-height:1}
+.avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.card-text{min-width:0}
+.card-title{font-size:14px;line-height:20px;font-weight:500;margin:0 0 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{font-size:12px;line-height:18px;color:var(--text-2)}
+.card-meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.card:hover .card-title{color:var(--text)}
+/* skeletons */
+.sk-thumb,.sk-line,.sk-av{background:linear-gradient(90deg,var(--sk) 25%,var(--sk2) 37%,var(--sk) 63%);background-size:400% 100%;animation:sh 1.3s ease infinite;border-radius:8px}
+.sk-av{border-radius:50%}
+.sk-line{height:12px;margin-bottom:8px}
+@keyframes sh{0%{background-position:100% 0}100%{background-position:0 0}}
+/*=========================== watch page ===========================*/
+.watch{display:flex;gap:24px;padding:24px 24px 48px;max-width:1754px;margin:0 auto;align-items:flex-start}
+.watch-main{flex:1 1 auto;min-width:0}
+.player{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}
+.player iframe{width:100%;height:100%;border:0;display:block}
+.player .poster{width:100%;height:100%;object-fit:cover;display:block;opacity:.85}
+.play-btn{position:absolute;inset:0;margin:auto;width:68px;height:48px;border-radius:12px;background:rgba(0,0,0,.65);display:grid;place-items:center}
+.play-btn:hover{background:rgba(0,0,0,.85)}
+.play-btn svg{width:26px;height:26px;color:#fff;fill:currentColor;stroke:none}
+.watch-title{font-size:20px;line-height:28px;font-weight:700;margin:12px 0 4px}
+.channel-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0}
+.channel-left{display:flex;align-items:center;gap:12px;min-width:0}
+.channel-name{font-size:16px;line-height:22px;font-weight:500}
+.channel-subs{font-size:12px;color:var(--text-2)}
+.sub-btn{height:36px;padding:0 16px;border-radius:18px;background:var(--text);color:var(--bg);font-size:14px;font-weight:500;flex:none}
+.sub-btn:hover{opacity:.9}
+.sub-btn.on{background:var(--chip);color:var(--text)}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill-group{display:flex;align-items:center;height:36px;border-radius:18px;background:var(--chip);overflow:hidden}
+.pg-btn{display:flex;align-items:center;gap:6px;height:36px;padding:0 16px;font-size:14px;font-weight:500;white-space:nowrap}
+.pg-btn:hover{background:var(--chip-hover)}
+.pg-btn.down{padding:0 14px}
+.pg-btn svg{width:24px;height:24px}
+.pg-sep{width:1px;height:24px;background:var(--border);flex:none}
+.action-pill{display:flex;align-items:center;gap:6px;height:36px;padding:0 16px;border-radius:18px;background:var(--chip);font-size:14px;font-weight:500;white-space:nowrap}
+.action-pill:hover{background:var(--chip-hover)}
+.action-pill svg{width:24px;height:24px}
+.action-pill.icon-only{padding:0 10px}
+.desc{background:var(--desc);border-radius:12px;padding:12px;margin-top:4px;font-size:14px;line-height:20px;cursor:pointer}
+.desc-meta{font-weight:600;margin-bottom:4px}
+.desc-text{margin:0;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.desc.open .desc-text{display:block}
+.desc-toggle{font-weight:500;margin-top:2px}
+.comments{margin-top:24px}
+.comments-head{display:flex;align-items:center;gap:24px;font-size:20px;font-weight:700;margin-bottom:20px}
+.sort-btn{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500}
+.sort-btn svg{width:22px;height:22px}
+.comment-box{display:flex;gap:12px;align-items:flex-start}
+.comment-form{flex:1;min-width:0}
+.comment-input{width:100%;background:none;border:none;border-bottom:1px solid var(--border);outline:none;color:var(--text);font-size:14px;padding:6px 0 8px}
+.comment-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.comment-actions[hidden]{display:none}
+.text-btn{height:36px;padding:0 16px;border-radius:18px;font-weight:500;font-size:14px}
+.text-btn:hover{background:var(--hover)}
+.sub-btn.sm{height:36px;opacity:.55;cursor:default}
+/*=========================== related rail ===========================*/
+.watch-side{width:402px;flex:0 0 402px;display:flex;flex-direction:column;gap:10px}
+.side-title{font-size:16px;font-weight:500;margin-bottom:2px}
+.compact{display:flex;gap:8px;padding:4px;border-radius:10px;cursor:pointer}
+.compact:hover{background:var(--hover)}
+.compact .thumb{width:168px;flex:none;border-radius:8px}
+.compact .card-text{padding-top:2px}
+.compact .card-title{font-size:14px;line-height:20px;margin-bottom:4px}
+.compact .card-meta{font-size:12px}
+/*=========================== account menu ===========================*/
+.menu{position:fixed;top:54px;right:16px;width:300px;background:var(--menu);border-radius:12px;box-shadow:var(--shadow);padding:8px 0;z-index:90;overflow:hidden}
+.menu[hidden]{display:none}
+.menu-head{display:flex;gap:12px;align-items:center;padding:12px 16px 16px}
+.menu-head .avatar{width:40px;height:40px}
+.menu-name{font-size:16px;font-weight:500}
+.menu-mail{font-size:14px;color:var(--text-2)}
+.menu-sep{height:1px;background:var(--border);margin:8px 0}
+.menu-item{display:flex;align-items:center;gap:16px;width:100%;padding:10px 16px;font-size:14px;text-align:left}
+.menu-item:hover{background:var(--hover)}
+.menu-item svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.menu-status{margin-left:auto;font-size:11px;color:var(--text-2);display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;background:#2ba640}
+.dot.off{background:#f90}
+/*=========================== toast / misc ===========================*/
+.toast{position:fixed;left:24px;bottom:24px;z-index:120;background:#f1f1f1;color:#0f0f0f;font-size:14px;font-weight:500;padding:14px 18px;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.4);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .18s,transform .18s;max-width:min(420px,80vw)}
+.toast.show{opacity:1;transform:none}
+[data-theme=light] .toast{background:#0f0f0f;color:#f1f1f1}
+.empty{padding:48px 24px;text-align:center;color:var(--text-2);font-size:14px}
+.empty b{display:block;color:var(--text);font-size:18px;font-weight:500;margin-bottom:6px}
+.scrim{display:none}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.watch{animation:fade .15s ease}
+/*=========================== shorts ===========================*/
+.shorts{position:relative;height:calc(100vh - 56px);overflow:hidden;animation:fade .15s ease}
+.shorts-head{position:absolute;top:14px;left:24px;right:24px;z-index:4;display:flex;align-items:center;gap:12px;pointer-events:none}
+.shorts-head h2{font-size:18px;font-weight:600;margin:0;display:flex;align-items:center;gap:8px}
+.shorts-head h2 svg{width:24px;height:24px}
+.shorts-head .spacer{flex:1}
+.shorts-back,.shorts-refresh{pointer-events:auto;display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:18px;background:var(--chip);font-size:13px;font-weight:500}
+.shorts-back:hover,.shorts-refresh:hover{background:var(--chip-hover)}
+.shorts-back svg,.shorts-refresh svg{width:18px;height:18px}
+.shorts-scroll{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth;scrollbar-width:none;overscroll-behavior:contain}
+.shorts-scroll::-webkit-scrollbar{display:none}
+.short-item{height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;gap:22px;padding:56px 76px 16px 24px}
+.short-stage{position:relative;height:100%;aspect-ratio:9/16;max-width:min(100%,430px);border-radius:12px;overflow:hidden;background:#000;flex:none;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.45)}
+.short-stage iframe,.short-stage .poster{width:100%;height:100%;border:0;display:block;object-fit:cover}
+.short-stage .poster{filter:brightness(.82)}
+.short-play{position:absolute;inset:0;margin:auto;width:66px;height:66px;border-radius:50%;background:rgba(0,0,0,.55);display:grid;place-items:center}
+.short-play svg{width:30px;height:30px;color:#fff;fill:currentColor;stroke:none}
+.short-info{width:310px;max-width:32vw;align-self:flex-end;padding-bottom:26px;display:flex;flex-direction:column;gap:16px}
+.short-channel{display:flex;align-items:center;gap:10px;cursor:pointer;width:max-content;max-width:100%}
+.short-channel:hover .short-channel-name{text-decoration:underline}
+.short-channel .avatar{width:40px;height:40px}
+.short-channel-name{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.short-sub-btn{height:32px;padding:0 14px;border-radius:16px;background:var(--text);color:var(--bg);font-size:12px;font-weight:600;flex:none}
+.short-sub-btn.on{background:var(--chip);color:var(--text)}
+.short-title{font-size:14px;line-height:20px;margin:0}
+.short-title .hash{color:var(--focus)}
+.short-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.short-act{width:44px;height:44px;border-radius:50%;background:var(--chip);display:grid;place-items:center;flex:none}
+.short-act:hover{background:var(--chip-hover)}
+.short-act svg{width:22px;height:22px}
+.short-act.liked{color:var(--focus)}
+.short-act.liked svg{stroke:var(--focus)}
+.short-nav{position:absolute;right:16px;top:50%;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;gap:12px}
+.short-nav button{width:44px;height:44px;border-radius:50%;background:var(--chip);display:grid;place-items:center}
+.short-nav button:hover:not(:disabled){background:var(--chip-hover)}
+.short-nav button:disabled{opacity:.3;cursor:default}
+.short-nav svg{width:24px;height:24px}
+/*=========================== channel page ===========================*/
+.channel-banner{height:170px;background:linear-gradient(115deg,#202020,#3a3a3a 45%,var(--bg));position:relative;overflow:hidden}
+.channel-banner::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 30%,rgba(255,255,255,.09),transparent 45%)}
+.channel-head{display:flex;gap:24px;align-items:flex-end;padding:0 24px 20px;max-width:1600px;margin:0 auto}
+.channel-head .avatar{width:96px;height:96px;font-size:38px;border:4px solid var(--bg);margin-top:-48px;z-index:1}
+.channel-info{flex:1;min-width:0;padding-bottom:2px}
+.channel-name-lg{font-size:30px;line-height:36px;font-weight:700;margin:0 0 4px}
+.channel-handle{font-size:14px;color:var(--text-2)}
+.channel-stats{font-size:14px;color:var(--text-2);margin-top:6px}
+.channel-desc{font-size:14px;line-height:20px;color:var(--text-2);margin-top:8px;max-width:680px;white-space:pre-wrap}
+.channel-actions{display:flex;gap:8px;align-items:center;padding-bottom:4px}
+.channel-tabs{display:flex;gap:24px;padding:0 24px;border-bottom:1px solid var(--border);max-width:1600px;margin:0 auto}
+.channel-tab{height:48px;font-size:14px;font-weight:500;color:var(--text-2);border-bottom:2px solid transparent}
+.channel-tab.active{color:var(--text);border-bottom-color:var(--text)}
+/*=========================== playables ===========================*/
+.playables{padding:24px 24px 60px;max-width:1600px;margin:0 auto;animation:fade .15s ease}
+.play-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.play-head h1{font-size:24px;font-weight:700;margin:0;display:flex;align-items:center;gap:10px}
+.play-head h1 svg{width:28px;height:28px;color:var(--focus)}
+.play-sub{color:var(--text-2);font-size:14px;margin:0 0 22px}
+.play-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px}
+.play-card{background:var(--chip);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .12s ease,background .12s ease}
+.play-card:hover{transform:translateY(-3px);background:var(--chip-hover)}
+.play-thumb{aspect-ratio:16/10;display:grid;place-items:center;font-size:62px;line-height:1;position:relative;overflow:hidden}
+.play-thumb::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 28% 22%,rgba(255,255,255,.28),transparent 62%)}
+.play-badge{position:absolute;top:10px;left:10px;z-index:1;background:rgba(0,0,0,.45);color:#fff;font-size:11px;font-weight:600;padding:4px 9px;border-radius:12px}
+.play-play{position:absolute;right:12px;bottom:12px;z-index:1;width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.55);display:grid;place-items:center;color:#fff}
+.play-card-body{padding:12px 14px 14px}
+.play-card-title{font-size:15px;font-weight:600;margin:0 0 4px}
+.play-card-desc{font-size:12px;line-height:17px;color:var(--text-2);margin:0}
+.play-card-meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:11px;color:var(--text-2)}
+.play-best{color:var(--focus);font-weight:600}
+/* official catalog */
+.play-section{margin-top:30px}
+.play-section-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.play-section-head h2{font-size:19px;font-weight:600;margin:0}
+.play-section-head span{font-size:12px;color:var(--text-2)}
+.off-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.off-search{height:36px;min-width:200px;flex:1;max-width:320px;border:1px solid var(--border);background:var(--chip);border-radius:18px;padding:0 14px;color:var(--text);font-size:13px;outline:none}
+.off-search:focus{border-color:var(--focus)}
+.off-chip{height:32px;padding:0 12px;border-radius:16px;background:var(--chip);font-size:12px;font-weight:500;white-space:nowrap}
+.off-chip:hover{background:var(--chip-hover)}
+.off-chip.active{background:var(--text);color:var(--bg)}
+.play-thumb.img{display:block;aspect-ratio:16/9;background:var(--sk)}
+.play-thumb.img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.play-card.official .play-card-meta{margin-top:8px}
+.play-note{font-size:12px;line-height:18px;color:var(--text-2);margin:16px 0 0}
+.off-detail{display:grid;grid-template-columns:minmax(260px,400px) 1fr;gap:26px;align-items:start}
+.off-detail-img{width:100%;border-radius:16px;background:var(--sk);aspect-ratio:16/9;object-fit:cover;display:block}
+.off-detail h2{font-size:26px;line-height:32px;margin:0 0 8px}
+.off-detail .off-meta{font-size:13px;color:var(--text-2);margin-bottom:14px}
+.off-detail p{font-size:14px;line-height:22px;color:var(--text-2);max-width:720px}
+.off-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.off-actions .game-btn{display:inline-grid;place-items:center;text-decoration:none;height:42px}
+/* game player */
+.game-view{max-width:1080px;margin:0 auto;padding:18px 24px 60px}
+.game-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.game-top h1{font-size:22px;font-weight:700;margin:0;flex:1;min-width:160px}
+.game-layout{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.game-area{background:#141414;border:1px solid var(--border);border-radius:16px;padding:16px;display:grid;place-items:center;min-height:420px;flex:1;min-width:320px;position:relative}
+.game-side{width:250px;display:flex;flex-direction:column;gap:14px}
+.game-stat{background:var(--chip);border-radius:12px;padding:14px 16px}
+.game-stat b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-2);margin-bottom:4px}
+.game-stat span{font-size:28px;font-weight:700;line-height:1}
+.game-help{font-size:13px;line-height:20px;color:var(--text-2)}
+.game-btn{height:40px;padding:0 18px;border-radius:20px;background:var(--text);color:var(--bg);font-size:13px;font-weight:600}
+.game-btn:hover{opacity:.88}
+.game-btn.alt{background:var(--chip);color:var(--text)}
+.game-over{position:absolute;inset:0;background:rgba(0,0,0,.72);display:grid;place-items:center;text-align:center;z-index:3;border-radius:16px}
+.game-over b{display:block;color:#fff;font-size:26px;margin-bottom:6px}
+.game-over p{color:#ddd;font-size:14px;margin:0 0 18px}
+.game-over .game-btn{background:#fff;color:#111}
+.game-wrap{position:relative;line-height:0}
+.game-wrap canvas{border-radius:8px;max-width:100%;touch-action:none}
+/* game: 2048 */
+.g2048-top{display:flex;align-items:center;gap:14px;margin-bottom:12px;width:290px}
+.g2048-top div{flex:1;background:#bbada0;color:#fff;border-radius:6px;padding:7px 12px;text-align:center}
+.g2048-top b{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.g2048-top span{font-size:20px;font-weight:700}
+.g2048-grid{display:grid;grid-template-columns:repeat(4,64px);gap:8px;background:#bbada0;padding:8px;border-radius:10px;touch-action:none}
+.g2048 .t{width:64px;height:64px;border-radius:6px;background:#cdc1b4;display:grid;place-items:center;font-weight:800;font-size:22px;color:#776e65}
+.t2{background:#eee4da!important}.t4{background:#ede0c8!important}.t8{background:#f2b179!important;color:#fff!important}.t16{background:#f59563!important;color:#fff!important}
+.t32{background:#f67c5f!important;color:#fff!important}.t64{background:#f65e3b!important;color:#fff!important}.t128{background:#edcf72!important;color:#fff!important;font-size:18px!important}
+.t256{background:#edcc61!important;color:#fff!important;font-size:18px!important}.t512{background:#edc850!important;color:#fff!important;font-size:18px!important}
+.t1024{background:#edc53f!important;color:#fff!important;font-size:16px!important}.t2048{background:#edc22e!important;color:#fff!important;font-size:16px!important}
+.t4096{background:#3c3a32!important;color:#fff!important;font-size:16px!important}
+/* game: memory */
+.mem-grid{display:grid;grid-template-columns:repeat(4,68px);gap:8px}
+.mem-card{width:68px;height:68px;border-radius:8px;background:#3a3a3a;display:grid;place-items:center;font-size:30px;cursor:pointer;user-select:none;transition:transform .12s,background .12s}
+.mem-card.flip{background:#f1f1f1;transform:rotateY(180deg)}
+.mem-card.matched{background:#2e7d32;opacity:.7}
+.mem-card span{display:none}
+.mem-card.flip span,.mem-card.matched span{display:block}
+.mem-card.flip{transform:none}
+/* game: whack-a-mole */
+.mole-grid{display:grid;grid-template-columns:repeat(3,86px);gap:12px}
+.hole{width:86px;height:86px;border-radius:50%;background:#3b2a20;position:relative;overflow:hidden;box-shadow:inset 0 8px 14px rgba(0,0,0,.55)}
+.mole{position:absolute;left:50%;bottom:-70px;transform:translateX(-50%);width:64px;height:64px;border-radius:50% 50% 42% 42%;background:#c98a52;display:grid;place-items:center;font-size:30px;cursor:pointer;transition:bottom .12s;user-select:none}
+.mole.up{bottom:8px}
+.mole.hit{background:#e8b36b;transform:translateX(-50%) scale(.9)}
+/*=========================== responsive ===========================*/
+@media (max-width:1200px){.watch-side{width:344px;flex-basis:344px}.compact .thumb{width:150px}}
+@media (max-width:1000px){
+.watch{flex-direction:column;padding:16px 16px 40px}
+.watch-side{width:100%;flex:1 1 auto}
+.compact .thumb{width:168px}
+}
+@media (max-width:791px){
+body[data-nav=full] .sidebar{display:block}
+body.drawer .scrim{display:block;position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.5);z-index:65}
+.mh-center{padding:0 4px}
+.pill-btn .txt{display:none}
+.mh-right{gap:4px}
+}
+@media (max-width:640px){
+.mic-btn{display:none}
+.logo-word{display:none}
+.logo{padding:0 2px}
+.mh-left{gap:0}
+.mh-center{padding:0 2px}
+.chips{padding:10px 12px}
+.watch-title{font-size:18px;line-height:24px}
+.comments-head{font-size:18px}
+}
+@media (max-width:560px){
+.grid{padding:8px 12px 40px}
+.watch{padding:12px 12px 32px}
+.actions{gap:6px}
+.action-pill .txt{display:none}
+.action-pill{padding:0 12px}
+}
+@media (max-width:900px){
+ .short-item{padding:52px 64px 12px 12px;gap:12px}
+ .short-info{width:240px;max-width:36vw;padding-bottom:18px;gap:12px}
+ .short-nav{right:6px}
+}
+@media (max-width:640px){
+ .shorts-head{left:12px;right:12px;top:10px}
+ .shorts-head h2{font-size:16px}
+ .shorts-back,.shorts-refresh{padding:0 10px}
+ .short-item{padding:0;gap:0;display:block;position:relative}
+ .short-stage{height:100%;width:100%;max-width:none;aspect-ratio:auto;border-radius:0;box-shadow:none}
+ .short-info{position:absolute;left:12px;bottom:14px;width:calc(100% - 88px);max-width:none;padding:0;gap:10px;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+ .short-info .short-channel-name,.short-info .short-title{color:#fff}
+ .short-sub-btn{background:#fff;color:#0f0f0f}
+ .short-actions{position:absolute;right:10px;bottom:16px;flex-direction:column;gap:12px}
+ .short-nav{display:none}
+ .short-title{font-size:13px;line-height:18px}
+ .channel-banner{height:120px}
+ .channel-head{flex-wrap:wrap;gap:12px;padding:0 16px 16px}
+ .channel-head .avatar{width:72px;height:72px;font-size:30px;margin-top:-36px}
+ .channel-name-lg{font-size:22px;line-height:28px}
+ .channel-tabs{padding:0 16px;gap:18px}
+ .playables{padding:16px 12px 40px}
+ .play-head h1{font-size:20px}
+ .play-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+ .play-thumb{font-size:44px}
+ .play-card-title{font-size:13px}
+ .game-view{padding:14px 12px 40px}
+ .game-layout{flex-direction:column}
+ .game-side{width:100%;flex-direction:row;flex-wrap:wrap}
+ .game-side>*{flex:1;min-width:110px}
+ .game-area{min-width:0;padding:10px}
+ .mole-grid{grid-template-columns:repeat(3,72px);gap:8px}
+ .hole{width:72px;height:72px}
+ .mole{width:54px;height:54px}
+ .mem-grid{grid-template-columns:repeat(4,58px);gap:6px}
+ .mem-card{width:58px;height:58px;font-size:25px}
+ .off-detail{grid-template-columns:1fr}
+ .off-detail h2{font-size:21px;line-height:27px}
+ .off-search{max-width:none;min-width:0}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/*=========================== small bits ===========================*/
+.pg-btn.liked{color:var(--focus)}
+.pg-btn.liked svg{stroke:var(--focus)}
+.comment-item{display:flex;gap:12px;margin-top:20px}
+.comment-head{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--text-2)}
+.comment-head b{color:var(--text);font-size:13px;font-weight:500}
+.comment-text{font-size:14px;line-height:20px;margin-top:2px;white-space:pre-wrap;word-break:break-word}
+.sub-channel{gap:16px}
+.chan-hit{cursor:pointer}
+.chan-hit:hover{text-decoration:underline}
+.card-body .av-hit{display:flex;flex:none}
+.search-field input::-webkit-search-cancel-button{display:none}
+</style>
+</head>
+<body data-theme="dark" data-nav="full">
+<header class="masthead">
+  <div class="mh-left">
+    <button class="icon-btn" id="menuBtn" aria-label="Guide">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
+    </button>
+    <a class="logo" href="#" id="logoLink" aria-label="YouTube Home">
+      <svg class="logo-mark" viewBox="0 0 30 21" aria-hidden="true"><rect width="30" height="21" rx="6.5" fill="#ff0000"/><path d="M12 5.6 21 10.5 12 15.4z" fill="#fff"/></svg>
+      <span class="logo-word">YouTube</span><span class="logo-cc">US</span>
+    </a>
+  </div>
+  <form class="mh-center" id="searchForm" role="search">
+    <div class="search-field">
+      <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.6 15.6 4.4 4.4"/></svg>
+      <input id="searchInput" type="search" placeholder="Search" autocomplete="off" spellcheck="false" aria-label="Search">
+    </div>
+    <button class="search-btn" type="submit" aria-label="Search">
+      <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.6 15.6 4.4 4.4"/></svg>
+    </button>
+    <button class="mic-btn" type="button" id="micBtn" aria-label="Search with your voice">
+      <svg viewBox="0 0 24 24" width="20" height="20"><rect x="9" y="2.6" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.4"/></svg>
+    </button>
+  </form>
+  <div class="mh-right">
+    <button class="pill-btn" id="createBtn" title="Create">
+      <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3.5" y="3.5" width="17" height="17" rx="5.5"/><path d="M12 8.4v7.2M8.4 12h7.2"/></svg><span class="txt">Create</span>
+    </button>
+    <button class="icon-btn bell" id="bellBtn" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 3a6 6 0 0 0-6 6c0 3.6-.7 5.4-1.7 6.7-.4.5 0 1.3.6 1.3h14.2c.6 0 1-.8.6-1.3-1-1.3-1.7-3.1-1.7-6.7a6 6 0 0 0-6-6Z"/><path d="M9.6 20a2.6 2.6 0 0 0 4.8 0"/></svg>
+    </button>
+    <button class="avatar-btn" id="avatarBtn" aria-label="Account">C</button>
+  </div>
+</header>
+<aside class="sidebar" id="sidebar" aria-label="Guide"></aside>
+<div class="scrim" id="scrim"></div>
+<main class="main">
+  <div id="browseView">
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid" aria-live="polite"></div>
+  </div>
+  <div id="watchView" hidden></div>
+  <div id="shortsView" hidden></div>
+  <div id="channelView" hidden></div>
+  <div id="playablesView" hidden></div>
+</main>
+<div class="menu" id="accountMenu" hidden>
+  <div class="menu-head">
+    <div class="avatar" style="background:#7d4bd1">C</div>
+    <div><div class="menu-name">Constance</div><div class="menu-mail">@constance</div></div>
+  </div>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-act="channel">Your channel</button>
+  <button class="menu-item" data-act="studio">YouTube Studio</button>
+  <button class="menu-item" data-act="theme" id="themeItem">Appearance: Dark</button>
+  <button class="menu-item" data-act="shortcuts">Keyboard shortcuts</button>
+  <button class="menu-item" data-act="settings">Settings</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" data-act="signout">Sign out</button>
+  <div class="menu-sep"></div>
+  <div class="menu-item" style="cursor:default;font-size:12px;color:var(--text-2)">
+    <span>YouTube API</span>
+    <span class="menu-status" id="apiStatus"><span class="dot off" id="apiDot"></span><span id="apiText">idle</span></span>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+/*=========================== icons ===========================*/
+const I={
+menu:'<path d="M4 6.5h16M4 12h16M4 17.5h16"/>',
+search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.6 15.6 4.4 4.4"/>',
+mic:'<rect x="9" y="2.6" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.4"/>',
+create:'<rect x="3.5" y="3.5" width="17" height="17" rx="5.5"/><path d="M12 8.4v7.2M8.4 12h7.2"/>',
+bell:'<path d="M12 3a6 6 0 0 0-6 6c0 3.6-.7 5.4-1.7 6.7-.4.5 0 1.3.6 1.3h14.2c.6 0 1-.8.6-1.3-1-1.3-1.7-3.1-1.7-6.7a6 6 0 0 0-6-6Z"/><path d="M9.6 20a2.6 2.6 0 0 0 4.8 0"/>',
+home:'<path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/>',
+homeSolid:'<path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z" fill="currentColor"/>',
+shorts:'<rect x="7.4" y="2.6" width="9.2" height="18.8" rx="4.6" transform="rotate(-14 12 12)"/><path d="m10.6 9.4 4.2 2.6-4.2 2.6z" fill="currentColor" stroke="none"/>',
+subs:'<path d="M4 6.5h11M4 12h11M4 17.5h6"/><path d="m15.4 15.4 4.6 2.6-4.6 2.6z"/>',
+you:'<circle cx="12" cy="12" r="8.8"/><circle cx="12" cy="9.6" r="2.9"/><path d="M6.2 18.7a6.8 6.8 0 0 1 11.6 0"/>',
+history:'<path d="M3.7 11.9a8.4 8.4 0 1 0 2.4-5.7"/><path d="M3.5 4.4v4.4h4.4"/><path d="M12 7.6V12l3.2 1.9"/>',
+playlist:'<path d="M4 6.5h14M4 12h14M4 17.5h8"/><path d="m15.8 15.4 4.4 2.6-4.4 2.6z"/>',
+video:'<rect x="3" y="5" width="18" height="14" rx="3.5"/><path d="m10.2 9.6 4.8 2.4-4.8 2.4z"/>',
+clock:'<circle cx="12" cy="12" r="8.4"/><path d="M12 7.4V12l3.1 1.9"/>',
+like:'<path d="M7.5 20.5V10.6l4.1-6.4a2.2 2.2 0 0 1 3.6 2.3l-.9 3h4.2a2 2 0 0 1 2 2.4l-1.2 6.3a2.4 2.4 0 0 1-2.4 2H7.5Z"/><path d="M7.5 20.5H4.7A1.7 1.7 0 0 1 3 18.8v-6.5a1.7 1.7 0 0 1 1.7-1.7h2.8"/>',
+dislike:'<path d="M16.5 3.5v9.9l-4.1 6.4a2.2 2.2 0 0 1-3.6-2.3l.9-3H5.5a2 2 0 0 1-2-2.4l1.2-6.3A2.4 2.4 0 0 1 7.1 3.5h9.4Z"/><path d="M16.5 3.5h2.8A1.7 1.7 0 0 1 21 5.2v6.5a1.7 1.7 0 0 1-1.7 1.7h-2.8"/>',
+share:'<path d="M14.6 5.4 21 12l-6.4 6.6"/><path d="M21 12H9.4a5.2 5.2 0 0 0-5.2 5.2v2.2"/>',
+download:'<path d="M12 3.2v12"/><path d="m7.6 10.6 4.4 4.4 4.4-4.4"/><path d="M4 20.2h16"/>',
+cut:'<circle cx="7" cy="17.4" r="2.7"/><circle cx="7" cy="6.6" r="2.7"/><path d="M9.3 8.5 20 19.2M20 4.8 9.3 15.5"/>',
+more:'<circle cx="12" cy="5.6" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18.4" r="1.4" fill="currentColor" stroke="none"/>',
+fire:'<path d="M12.4 3.4c.6 3.1 2.7 4.4 3.6 6.6.9 2.2.1 4.6-1.6 5.7.3-2-.9-3.5-2.4-4.2.1 2.2-1.4 3.5-3 4.1-1.1-1.3-1.6-3-1.3-4.7.4-2.6 2.7-4.1 4.7-7.5Z"/>',
+music:'<circle cx="7" cy="17.4" r="2.7"/><circle cx="18" cy="15.4" r="2.7"/><path d="M9.7 17.4V7.2l10.9-2.2v10.4"/>',
+game:'<rect x="2.6" y="7" width="18.8" height="10.6" rx="4.2"/><path d="M7.6 9.9v4.8M5.2 12.3H10"/><circle cx="16.4" cy="10.9" r=".9" fill="currentColor" stroke="none"/><circle cx="18.6" cy="13.4" r=".9" fill="currentColor" stroke="none"/>',
+playables:'<rect x="2.4" y="7" width="19.2" height="10.4" rx="4.6"/><path d="M6.6 10.6v3.2M5 12.2h3.2"/><path d="m14.6 10.8 3.4 1.4-3.4 1.4z" fill="currentColor" stroke="none"/><circle cx="18.4" cy="10.2" r=".9" fill="currentColor" stroke="none"/>',
+news:'<rect x="3.6" y="5" width="13.4" height="14" rx="2"/><path d="M17 9.4h2a1.6 1.6 0 0 1 1.6 1.6v6.2a2 2 0 0 1-3.4 1.4"/><path d="M6.6 8.4h7.4M6.6 12h7.4M6.6 15.6h4"/>',
+sport:'<path d="M8 3.8h8v5.1a4 4 0 0 1-8 0V3.8Z"/><path d="M8 5.4H5.6a2.4 2.4 0 0 0 2.4 4M16 5.4h2.4a2.4 2.4 0 0 1-2.4 4"/><path d="M12 12.9v3.4M8.6 20.2h6.8"/>',
+gear:'<circle cx="12" cy="12" r="3.1"/><path d="M12 2.8v2.3M12 18.9v2.3M21.2 12h-2.3M5.1 12H2.8M18.5 5.5l-1.6 1.6M7.1 16.9l-1.6 1.6M18.5 18.5l-1.6-1.6M7.1 7.1 5.5 5.5"/>',
+flag:'<path d="M5.2 21V3.6"/><path d="M5.2 4.4h10.6l-1.9 3.8 1.9 3.8H5.2"/>',
+help:'<circle cx="12" cy="12" r="8.6"/><path d="M9.7 9.5a2.5 2.5 0 1 1 3.6 2.3c-.7.4-1.2 1-1.2 1.8v.2"/><circle cx="12" cy="16.9" r=".9" fill="currentColor" stroke="none"/>',
+feedback:'<path d="M20.4 11.7a8.4 8.4 0 0 1-12.2 7.5L3.6 20.4l1.2-4.5a8.4 8.4 0 1 1 15.6-4.2Z"/><path d="M12 7.9v4.6"/><circle cx="12" cy="15.7" r=".9" fill="currentColor" stroke="none"/>',
+play:'<path d="M8 5.2v13.6L19 12 8 5.2Z" fill="currentColor" stroke="none"/>',
+sort:'<path d="M4 6.5h16M7 12h10M10 17.5h4"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.8v2.4M12 18.8v2.4M21.2 12h-2.4M5.2 12H2.8M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2 5.5 5.5"/>',
+close:'<path d="M6 6l12 12M18 6 6 18"/>',
+up:'<path d="m6 14 6-6 6 6"/>',
+down:'<path d="m6 10 6 6 6-6"/>',
+back:'<path d="M15 5.5 8.5 12l6.5 6.5"/>',
+refresh:'<path d="M20 7.5V3.8m0 3.7h-3.7"/><path d="M4 16.5v3.7m0-3.7h3.7"/><path d="M19 12a7 7 0 0 1-12.3 4.5M5 12a7 7 0 0 1 12.3-4.5"/>',
+comment:'<path d="M20.5 11.7a8.5 8.5 0 0 1-12.3 7.6L3.5 20.5l1.2-4.6a8.5 8.5 0 1 1 15.8-4.2Z"/>',
+verified:'<path d="m12 2.6 2.4 1.8 3-.2.9 2.9 2.4 1.8-1 2.9 1 2.9-2.4 1.8-.9 2.9-3-.2L12 21.4l-2.4-1.8-3 .2-.9-2.9-2.4-1.8 1-2.9-1-2.9 2.4-1.8.9-2.9 3 .2z"/><path d="m8.8 12.2 2.1 2.1 4.3-4.5"/>'
+};
+const Svg=(n,s)=>'<svg viewBox="0 0 24 24" width="'+(s||24)+'" height="'+(s||24)+'" aria-hidden="true">'+(I[n]||'')+'</svg>';
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+/*=========================== config ===========================*/
+/* Demo key is hard-coded in this single file (visible to anyone who opens it).
+   Do not publish this page with a private key — move the key to a server proxy. */
+const RAPID_KEY='c6788a1101msh0d978c7a88c5ad8p12f584jsn362a31c99bb8';
+const API_TARGETS=[
+{host:'youtube-v31.p.rapidapi.com',path:(q,cur)=>'/search?part=snippet&q='+encodeURIComponent(q)+'&maxResults=32'+(cur?'&cursor='+encodeURIComponent(cur):'')},
+{host:'youtube-v2.p.rapidapi.com',path:(q,cur)=>'/search/?query='+encodeURIComponent(q)+(cur?'&cursor='+encodeURIComponent(cur):'')}
+];
+/* A public, CORS-enabled YouTube metadata API that needs no key. Used whenever the
+   RapidAPI key is rate-limited/not subscribed, so search works for ANY topic. */
+const INV_HOST='https://yt.chocolatemoo53.com';
+const CHIPS=['All','Music','Gaming','Live','WWE','NXT','Wrestling','News','Sports','Podcasts','Movies','Comedy','Recently uploaded'];
+const FALLBACK_SUBS=['NXT','WWE en Español','WWE Vault','WWE Music'];
+/* Deliberately mixed pool of Shorts channels: comedy, science, sports, music,
+   pets, kids, DIY and more. The feed shuffles the pool on every load. */
+const SHORT_CHANNELS=[
+ 'UCdC0An4ZPNr_YiFiYoVbwaw','UCX6OQ3DkcsbYNE6H8uQQuVA','UC295-Dw_tDNtZXFeAPAW6Aw',
+ 'UCpVm7bg6pXKo1Pr6k5kxG9A','UCLA_DiR1FfKNvjuUpBHmylQ','UCiWLfSweyRNmLpgEHekhoAg',
+ 'UCsXVk37bltHxD1rDPwtNM8Q','UCSJ4gkVC6NrvII8umztf0Ow','UCRijo3ddMTht_IHyNSNXpNQ',
+ 'UCUsN5ZwHx2kILm84-jPDeXw','UCPAt6z5uX_c5Eo_cSNROzYw','UCPIvT-zcQl2H0vabdXJGcpg',
+ 'UCyeVfsThIHM_mEZq7YXIQSQ','UC_zEzzq54Rm0iy7lmmZbCIg'
+];
+/* Offline Shorts fallback (real video IDs, used only if every live source fails). */
+const SHORT_SEED=[
+ ['mluv3TrWe8U','They Wanted To Make This Birthday Special','Daily Dose Of Internet','UCdC0An4ZPNr_YiFiYoVbwaw'],
+ ['qBmAtHyXGs8','Baby Turtle Tries to Get to the Ocean','Daily Dose Of Internet','UCdC0An4ZPNr_YiFiYoVbwaw'],
+ ['m9UTmZvAk_4','This Defied Physics','Daily Dose Of Internet','UCdC0An4ZPNr_YiFiYoVbwaw'],
+ ['RogsCik9_0U','He Wanted No Part of It','Daily Dose Of Internet','UCdC0An4ZPNr_YiFiYoVbwaw'],
+ ['Lcf1MBqCftA',"They Really Didn't Want to Answer This Question",'Daily Dose Of Internet','UCdC0An4ZPNr_YiFiYoVbwaw'],
+ ['75lYJ4GO7M0',"That's One Way to Cross a River",'Daily Dose Of Internet','UCdC0An4ZPNr_YiFiYoVbwaw'],
+ ['sHpEqeSByPI','Unboxing The World’s Largest Toy','MrBeast','UCX6OQ3DkcsbYNE6H8uQQuVA'],
+ ['kPI9Mc35mOg','Trap Door Roulette','MrBeast','UCX6OQ3DkcsbYNE6H8uQQuVA'],
+ ['41UzbuW6wJs','Can A Robot Do My Chores?','MrBeast','UCX6OQ3DkcsbYNE6H8uQQuVA'],
+ ['mND4T0lzg_g','How People Treat You Based on Subscribers','MrBeast','UCX6OQ3DkcsbYNE6H8uQQuVA'],
+ ['n4jC83Byt3k','YOU NEED THIS SUMMER HACK RIGHT NOW! 🤯🔥 #shorts','5-Minute Crafts','UC295-Dw_tDNtZXFeAPAW6Aw'],
+ ['hNCPw01Dzhk','PARENTING PRO TIPS || Fun Hacks for Everyday Challenges','5-Minute Crafts','UC295-Dw_tDNtZXFeAPAW6Aw'],
+ ['NlJh2VtArgc','Mind-Blowing Mini Craft Magic! #DIY #epoxy','5-Minute Crafts','UC295-Dw_tDNtZXFeAPAW6Aw'],
+ ['oJcNzBDmw9M','Valentine or Birthday idea that you will gasp about! ❤️😍','5-Minute Crafts','UC295-Dw_tDNtZXFeAPAW6Aw'],
+ ['dMTRx9yuJLs','Dinosaurs roamed the Earth until 65 million years ago, so what took them out?','National Geographic','UCpVm7bg6pXKo1Pr6k5kxG9A'],
+ ['sSqg_VgKZZo','Meet the giants of the Pacific #ExpeditionSavingOurSeas #PerpetualPlanet','National Geographic','UCpVm7bg6pXKo1Pr6k5kxG9A'],
+ ['1KSRtRTtdfc','The Voyager spacecrafts are the farthest objects humans have sent anywhere, but what do they carry?','National Geographic','UCpVm7bg6pXKo1Pr6k5kxG9A'],
+ ['2Qg4LtMF1I0','Who can explore the deep sea? #PerpetualPlanet #ExpeditionSavingOurSeas','National Geographic','UCpVm7bg6pXKo1Pr6k5kxG9A'],
+ ['HCpct3QkQMs','Climbing Everest takes incredible determination. Capturing it on film adds a whole new challenge.','National Geographic','UCpVm7bg6pXKo1Pr6k5kxG9A'],
+ ['k5Z7sFwFF7Q','Become a NASA Astronaut!','NASA','UCLA_DiR1FfKNvjuUpBHmylQ'],
+ ['-62C9R_41Sc','From the Moon to the 50-Yard Line','NASA','UCLA_DiR1FfKNvjuUpBHmylQ'],
+ ['myZ9kn9MIWQ','2026 Solar Eclipse @ 50,000 Feet','NASA','UCLA_DiR1FfKNvjuUpBHmylQ'],
+ ['QP5Fs3AYuWE','2026 Total Solar Eclipse Over Spain','NASA','UCLA_DiR1FfKNvjuUpBHmylQ'],
+ ['5_csmuheNiQ','They’re really serving food from GTA VI 🍟🤣','ESPN','UCiWLfSweyRNmLpgEHekhoAg'],
+ ['0JUuk7R0p3w','Boise SHOWED OUT for College GameDay 🔥 @HomeDepot','ESPN','UCiWLfSweyRNmLpgEHekhoAg'],
+ ['-cL72duN8_A','Watch out for Wake Forest','ESPN','UCiWLfSweyRNmLpgEHekhoAg'],
+ ['SD_Roibi5A0','Toronto Could Be Perfect For JuJu!','ESPN','UCiWLfSweyRNmLpgEHekhoAg'],
+ ['NKeZ_HRk_O8','Cool Down Your Room... With a FRIDGE?','Kurzgesagt','UCsXVk37bltHxD1rDPwtNM8Q'],
+ ['Y1vEGsnNYek','What Is Food Fortification?','Kurzgesagt','UCsXVk37bltHxD1rDPwtNM8Q'],
+ ['KBfIo9sZbC4','How Does Ketamine Work?','Kurzgesagt','UCsXVk37bltHxD1rDPwtNM8Q'],
+ ['35No369rmq0','What If We Cool Down the Sun?','Kurzgesagt','UCsXVk37bltHxD1rDPwtNM8Q'],
+ ['W5FeihU43oc',"oh no... not the flu... i'm devastated... *cough cough* #gta6 #gtavi #lifehack",'Lofi Girl','UCSJ4gkVC6NrvII8umztf0Ow'],
+ ['zOmPF_Z8ZS8','peak hibernation season #sleep #procrastination #studytube','Lofi Girl','UCSJ4gkVC6NrvII8umztf0Ow'],
+ ['Po1uOfVLwO4','what did you get? tell me in the comments 👇','Lofi Girl','UCSJ4gkVC6NrvII8umztf0Ow'],
+ ['hCqTWYeahV8','(the same people who say they failed a test but actually get a great grade.)','Lofi Girl','UCSJ4gkVC6NrvII8umztf0Ow'],
+ ['m3VYLlfSqkM','Crush The Can First 🤣','Dude Perfect','UCRijo3ddMTht_IHyNSNXpNQ'],
+ ['k1nKF9x_VB4','Football But In REVERSE 👀','Dude Perfect','UCRijo3ddMTht_IHyNSNXpNQ'],
+ ['tFI78IyXRvw','Don’t Say The Same Thing! 🤣','Dude Perfect','UCRijo3ddMTht_IHyNSNXpNQ'],
+ ['-0r0Nma-AFY','Blindfolded Basketball 🤣','Dude Perfect','UCRijo3ddMTht_IHyNSNXpNQ'],
+ ['JzaE9TgaNbU','The top minds are on it. A brand-new episode comes out TONIGHT at 10:30/9:30c. #BeavisandButtHead','Comedy Central','UCUsN5ZwHx2kILm84-jPDeXw'],
+ ['hZTO6CF2JM8','If looks could kill. #Detroiters','Comedy Central','UCUsN5ZwHx2kILm84-jPDeXw'],
+ ['5RA1LZy_rj4','Nobody ever talks about the chicken-to-nugget pipeline.  #BeavisandButtHead','Comedy Central','UCUsN5ZwHx2kILm84-jPDeXw'],
+ ['TZov-wIoX_Q',"The name's DeMamp. Adam DeMamp. #workaholics #bond",'Comedy Central','UCUsN5ZwHx2kILm84-jPDeXw'],
+ ['8CShqIbKWdY','Dejounte Murray DEMANDS a Trade 🏀#dejountemurray #neworleanspelicans #joedumars #nbatrade #nba','Sports Illustrated','UCPAt6z5uX_c5Eo_cSNROzYw'],
+ ['LC0ryhtvI_E','Kaelon Black Could Be a Fantasy League Winner 🥇 #fantasyfootball #nfl','Sports Illustrated','UCPAt6z5uX_c5Eo_cSNROzYw'],
+ ['BRObnIQnK_o','Should NFL Change Seeding Rules for Playoffs? 🏈 #nfl','Sports Illustrated','UCPAt6z5uX_c5Eo_cSNROzYw'],
+ ['QFXj01XZs8M','Pressure Builds on Brian Schottenheimer and Cowboys Defense | The Story with Rachel Nichols','Sports Illustrated','UCPAt6z5uX_c5Eo_cSNROzYw'],
+ ['os7urwCwK8M','Squirrels Are Hardcore','The Pet Collective','UCPIvT-zcQl2H0vabdXJGcpg'],
+ ['DA0FfVB3yYw','Gecko Licks Piece of Papaya on Table','The Pet Collective','UCPIvT-zcQl2H0vabdXJGcpg'],
+ ['OZVwpH7ygAU','Animals Destroying Your Backyard','The Pet Collective','UCPIvT-zcQl2H0vabdXJGcpg'],
+ ['pY7esuSqvOA','It’s GROSS to let a dog lick your face! 🤢 | Petty Takes','The Pet Collective','UCPIvT-zcQl2H0vabdXJGcpg'],
+ ['CMKxXyWkBHw','Opening the NEW Pokémon TCG: Mega Evolution set! #Ad','MoreAliA','UCyeVfsThIHM_mEZq7YXIQSQ'],
+ ['K3v_DKww3dk',"World's Dumbest Kids! 🤦‍♂️",'MoreAliA','UCyeVfsThIHM_mEZq7YXIQSQ'],
+ ['BdtDfnUw2ss','Is this your Birthday...? 🥳','MoreAliA','UCyeVfsThIHM_mEZq7YXIQSQ'],
+ ['PAC4XP8hgn4',"World's WORST Playgrounds! 🙄",'MoreAliA','UCyeVfsThIHM_mEZq7YXIQSQ'],
+ ['Nbftd4xGLWM',"World's Greatest Marble Run!",'MoreAliA','UCyeVfsThIHM_mEZq7YXIQSQ'],
+ ['tKenpmSSd5k','Kids Getting Caught...!','MoreAliA','UCyeVfsThIHM_mEZq7YXIQSQ'],
+ ['GAF02jEvOv8','POV: Your daughter just watched Up for the first time #AFV Shorts',"America's Funniest Home Videos",'UC_zEzzq54Rm0iy7lmmZbCIg'],
+ ['MJzQgjMzzzQ','The snow knew exactly who to target #funny #viral',"America's Funniest Home Videos",'UC_zEzzq54Rm0iy7lmmZbCIg'],
+ ['G69uJnkZu1Q','This is why you listen to Mom #AFV #fail',"America's Funniest Home Videos",'UC_zEzzq54Rm0iy7lmmZbCIg'],
+ ['7qsE1Vbvc24','He Did NOT Expect The Bumps To Hit Like That #AFV #Fails',"America's Funniest Home Videos",'UC_zEzzq54Rm0iy7lmmZbCIg'],
+ ['PiyB7YgA9qc','He got a gate opener 6 years ago and finally used it #funny #AFV',"America's Funniest Home Videos",'UC_zEzzq54Rm0iy7lmmZbCIg'],
+ ['Q4xgvnuIPbc','Girl tries walking in giant heels and this happens 😂 #funny #fails #shorts',"America's Funniest Home Videos",'UC_zEzzq54Rm0iy7lmmZbCIg']
+];
+/*=========================== helpers ===========================*/
+function trimNum(x){const r=x>=100?Math.round(x):Math.round(x*10)/10;return String(r).replace(/\.0$/,'');}
+function fmtShort(n){n=Number(n)||0;if(n>=1e9)return trimNum(n/1e9)+'B';if(n>=1e6)return trimNum(n/1e6)+'M';if(n>=1e3)return trimNum(n/1e3)+'K';return String(n);}
+function fmtViews(n){n=Number(n)||0;if(!n)return 'No views';if(n>=1e9)return trimNum(n/1e9)+'B views';if(n>=1e6)return trimNum(n/1e6)+'M views';if(n>=1e3)return trimNum(n/1e3)+'K views';return n+(n===1?' view':' views');}
+function fmtDur(t){t=Math.max(0,Math.round(Number(t)||0));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;return h?h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'):m+':'+String(s).padStart(2,'0');}
+function colorFor(n){const P=['#7d4bd1','#c2185b','#00838f','#ef6c00','#2e7d32','#455a64','#5e35b1','#ad1457','#00695c','#6d4c41'];let h=0;n=String(n||'');for(let i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))>>>0;return P[h%P.length];}
+function initial(n){return String(n||'?').trim().charAt(0).toUpperCase();}
+function shuffle(a){
+  const out=a.slice();
+  for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=out[i];out[i]=out[j];out[j]=t;}
+  return out;
+}
+function avatarHTML(name,url,size){
+  size=size||36;
+  const st='width:'+size+'px;height:'+size+'px;background:'+colorFor(name);
+  if(url) return '<div class="avatar" style="'+st+'">'+esc(initial(name))
+    +'<img src="'+esc(url)+'" alt="" loading="eager" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()"></div>';
+  return '<div class="avatar" style="'+st+'">'+esc(initial(name))+'</div>';
+}
+function subsFor(n){if(/^wwe$/i.test(n||''))return '100M subscribers';return fmtShort(900000+((n||'').length*7919+colorFor(n).length*104729)%8600000)+' subscribers';}
+function likesFor(v){return fmtShort(Math.round((v.views||0)*0.042));}
+function commentsFor(v){return fmtShort(Math.max(3,Math.round((v.views||0)*0.008)));}
+/* Every video object ever loaded is cached here so watch pages opened from
+   Shorts or a channel still have the right title, thumbnail and channel. */
+const VIDEOS={};
+const CHANNELS={};
+const CHANNEL_AVATARS={
+ 'UCdC0An4ZPNr_YiFiYoVbwaw':'https://yt-comp1.chocolatemoo53.com/ggpht/ytc/AIdro_mVwCEqEf7Z9yboWxEOFXZMQWIRWMmgZy8ILLAj8_VnOfo=s176-c-k-c0x00ffffff-no-rj',
+ 'UCyeVfsThIHM_mEZq7YXIQSQ':'https://yt-comp1.chocolatemoo53.com/ggpht/ytc/AIdro_lAJPl64UghoDxSjmyEzYWXsCHW89FJW33ntJsXS1bBsUo=s176-c-k-c0x00ffffff-no-rj',
+ 'UC_zEzzq54Rm0iy7lmmZbCIg':'https://yt-comp1.chocolatemoo53.com/ggpht/Elp5coYuSyFHR7rfsx5ueYdi8jlOXyuOpP0_GZ6iGEI5QNROxlJm8gKpWo4rr9L255FzU7Iwgg=s176-c-k-c0x00ffffff-no-rj',
+ 'UCPIvT-zcQl2H0vabdXJGcpg':'https://yt-comp1.chocolatemoo53.com/ggpht/_Lr-Ku7QdcTGqp5qjYhmR3qllC9ZNofa1soJrT75puXwEpNgbw1UeDssPTeVKdzSlZma6gJKfME=s176-c-k-c0x00ffffff-no-rj',
+ 'UCp8fSwmug0BB_wW0A1MzXHQ':'https://yt-comp1.chocolatemoo53.com/ggpht/qwMBcONsvOX9_slCdnNCmAYAUG682U2RcZC9xSFWdS-qmKxF6MvCdCBVKM6nCzzq1wbgCJN__w=s176-c-k-c0x00ffffff-no-rj',
+ 'UClFZWPaA12RUD8WYkR0yiBw':'https://yt-comp1.chocolatemoo53.com/ggpht/Q8w1cAHtUzsG7iHAKL-SlNIeOqc6LNyNc4ioDehKlnnBl-IGFOfl8lLpRve8Vxn42Ip7icaXLA=s176-c-k-c0x00ffffff-no-rj',
+ 'UCX6OQ3DkcsbYNE6H8uQQuVA':'https://yt-comp1.chocolatemoo53.com/ggpht/nxYrc_1_2f77DoBadyxMTmv7ZpRZapHR5jbuYe7PlPd5cIRJxtNNEYyOC0ZsxaDyJJzXrnJiuDE=s512-c-k-c0x00ffffff-no-rj',
+ 'UC295-Dw_tDNtZXFeAPAW6Aw':'https://yt-comp1.chocolatemoo53.com/ggpht/qxMg7xnccD_tt-YtUTTK-ctCtUqUH9d3qKsbqm_DAti0nC7RHVbFlFiC6k8BoNS1O2O4ytAlZiE=s512-c-k-c0x00ffffff-no-rj',
+ 'UCpVm7bg6pXKo1Pr6k5kxG9A':'https://yt-comp1.chocolatemoo53.com/ggpht/4o29ZduZnGmxuRtqNf50bJtzmUtWaeh4W4cYuEXvQBz887R75UMRboX4zbNe71EO4hGgwwnr=s512-c-k-c0x00ffffff-no-rj',
+ 'UCLA_DiR1FfKNvjuUpBHmylQ':'https://yt-comp1.chocolatemoo53.com/ggpht/eIf5fNPcIcj9ig-wZBeq4stFy1lgjWTW1nLT5dYlFkHZprZ03QBiMcbpwNMB6XSBjrSFGtAGQg=s512-c-k-c0x00ffffff-no-rj',
+ 'UCiWLfSweyRNmLpgEHekhoAg':'https://yt-comp1.chocolatemoo53.com/ggpht/ytc/AIdro_mjPkMeFcQxySKuGOn-eSPaOaTK55KKtjF7LTkkwidfCP1D=s512-c-k-c0x00ffffff-no-rj',
+ 'UCsXVk37bltHxD1rDPwtNM8Q':'https://yt-comp1.chocolatemoo53.com/ggpht/ytc/AIdro_n1Ribd7LwdP_qKtqWL3ZDfIgv9M1d6g78VwpHGXVR2Ir4=s512-c-k-c0x00ffffff-no-rj',
+ 'UCSJ4gkVC6NrvII8umztf0Ow':'https://yt-comp1.chocolatemoo53.com/ggpht/REcZL_LGu0DaDaC-G7VIbN0uE_5l-i_dw6ZvOETRnY3pRhUmfkOq6C1MLephPZkV4VSzQAhEi_4=s512-c-k-c0x00ffffff-no-rj',
+ 'UCRijo3ddMTht_IHyNSNXpNQ':'https://yt-comp1.chocolatemoo53.com/ggpht/nZRsCgyfOVFhBzY-YFV8AhdMcYAybNZ8uttjcsrUGOnGRSVF5yKqRh6XHIs_o03TcbixvlOZ=s512-c-k-c0x00ffffff-no-rj',
+ 'UCUsN5ZwHx2kILm84-jPDeXw':'https://yt-comp1.chocolatemoo53.com/ggpht/kENjxM3Q5B0rgBE2kTPlzRYpbT8xc7gMYuhQRz7NVz6B-O9pTndDZt8UhOneZAOBjFInk-XbAw4=s512-c-k-c0x00ffffff-no-rj',
+ 'UCPAt6z5uX_c5Eo_cSNROzYw':'https://yt-comp1.chocolatemoo53.com/ggpht/GOKAaFacYecbd6Lk6O5PmfRC9UXePpob7rdIcM9y2jYkCCNx3vFQq8K15KAz0VnqMjR6VFbiLV8=s512-c-k-c0x00ffffff-no-rj'
+};
+Object.keys(CHANNEL_AVATARS).forEach(id=>{CHANNELS[id]={avatar:CHANNEL_AVATARS[id]};});
+SHORT_SEED.forEach(r=>{const c=CHANNELS[r[3]]||(CHANNELS[r[3]]={});c.name=c.name||r[2];});
+/*=========================== seed feed (offline fallback) ===========================*/
+const SEED_RAW=[
+['87M7CzCYMps',191,7555,'13 minutes ago','Brie Bella vs. Nikki Bella: Hell in a Cell 2014',['CC']],
+['zuyxim8zQk0',49,8291,'3 hours ago','Giovanni Vinci is the one to bring style to NXT 2.0: WWE Digital Exclusive, June 14, 2022',['CC']],
+['RmTvlibE72M',61,3069,'3 hours ago','Wes Lee isn’t going anywhere but up: WWE Digital Exclusive, June 14, 2022',['CC']],
+['MwVWbQBb4R0',310,37398,'3 hours ago','Indi Hartwell, Cora Jade, & Roxanne Perez vs. Toxic Attraction: WWE NXT, June 14, 2022',[]],
+['mgAgRbOcdSo',48,9628,'3 hours ago','Tony D’Angelo scolds Legado del Fantasma: WWE NXT, June 14, 2022',['CC']],
+['9PYNOiG-TBo',191,15320,'3 hours ago','Carmelo Hayes & Trick Williams vs. “Stacks” & “Two Dimes”: WWE NXT, June 14, 2022',[]],
+['OR-gDe2QoSk',105,7470,'3 hours ago','Cameron Grimes claims Edris Enofé & Malik Blade aren’t hungry enough: WWE NXT, June 14, 2022',['CC']],
+['gyuDH6D5xCs',86,11206,'3 hours ago','Grayson Waller has some choice words for Solo Sikoa: WWE NXT, June 14, 2022',['CC']],
+['2UvEldwKVeI',178,15258,'3 hours ago','Giovanni Vinci vs. Guru Raaj: WWE NXT, June 14, 2022',[]],
+['E-kem6cyqdg',100,30292,'3 hours ago','Apollo Crews deals with an unruly customer: WWE NXT, June 14, 2022',['CC']],
+['TzbOHhjG3Ws',53,5948,'4 hours ago','Von Wagner claims he will dominate Brooks Jensen: WWE NXT, June 14, 2022',['CC']],
+['kzCJipSBlAY',34,7208,'4 hours ago','NXT 2.0 Superstars take the show on the road for NXT Live Events: WWE NXT, June 14, 2022',['CC']],
+['VHs4zZ-5AiE',93,15487,'4 hours ago','There are no excuses for Roderick Strong: WWE NXT, June 14, 2022',[]],
+['XxCOKlCK478',309,17599,'4 hours ago','NXT Champion Bron Breakker vs. Duke Hudson: WWE NXT, June 14, 2022',[]],
+['KcxtyDdEA44',311,14937,'4 hours ago','Tony D’Angelo gives members of his “family” a new status in Omerta ceremony: WWE NXT, June 14, 2022',['CC']],
+['kzzVQiYtBC4',44,21769,'4 hours ago','Nikkita Lyons vows to return stronger than ever: WWE NXT, June 7, 2022',['CC']],
+['xPKVgWdjt0U',185,18175,'4 hours ago','Javier Bernal & Dante Chen vs. The Dyad: WWE NXT, June 14, 2022',['CC']],
+['7IV-RP02718',98,8423,'4 hours ago','Nathan Frazer’s heart has always been with WWE: WWE NXT, June 14, 2022',['CC']],
+['8rQHAOovRR4',190,16213,'4 hours ago','Wes Lee vs. Xyon Quinn: WWE NXT, June 14, 2022',['CC']],
+['67CoUasJv88',103,7876,'4 hours ago','Lash Legend has been a world-class athlete all her life: WWE NXT, June 14, 2022',['CC']],
+['ST0XrFjGaQQ',90,11518,'4 hours ago','Cameron Grimes isn’t looking for sympathy from Bron Breakker: WWE NXT, June 14, 2022',['CC']],
+['v-gzi3csw1Y',179,16239,'4 hours ago','Fallon Henley vs. Tiffany Stratton: WWE NXT, June 14, 2022',[]],
+['PUhvxMViCFM',187,18371,'5 hours ago','The Creed Brothers vs. Edris Enofé & Malik Blade - NXT Tag Team Title Match: WWE NXT, June 14, 2022',[]],
+['ubaGICCyzqg',408,14487,'10 hours ago','Seth “Freakin” Rollins CLASIFICÓ a Money in The Bank: WWE Ahora, Jun 13, 2022',['CC']],
+['quJX91CXglY',515,423609,'11 hours ago','Top 10 Raw moments: WWE Top 10, June 13, 2022',[]],
+['KgmxsG4Ig9M',86,25169,'11 hours ago','AJ Styles and Seth “Freakin” Rollins prepare to fight on Raw',['CC']],
+['dppxD9KbwPg',33,156466,'12 hours ago','Becky Lynch yells at Alexa Bliss during her entrance',['CC']],
+['Z3eOUy5q2i0',88,26992,'12 hours ago','Behind the scenes of WWE’s Pride Month photo shoot',['CC']],
+['nDJgnJ3aECg',491,31745,'13 hours ago','FULL MATCH — Kelly Kelly vs. Brie Bella - Divas Title Match: Money in the Bank 2011',['CC']],
+['CWxcu-t7jR4',158,15467,'15 hours ago','Maryse and Amanda suffer an ideas block: Miz & Mrs. Bonus June 14, 2022',['CC']]
+];
+const SEED=SEED_RAW.map(r=>({id:r[0],lengthSeconds:r[1],views:r[2],publishedTimeText:r[3],title:r[4],badges:r[5]||[],thumb:'https://i.ytimg.com/vi/'+r[0]+'/hqdefault.jpg',channelName:'WWE',channelAvatar:'',channelId:'',live:false}));
+SEED.forEach(v=>{VIDEOS[v.id]=v;});
+/*=========================== state ===========================*/
+const S={items:[],query:'',cursor:null,loading:false,current:null,navPinned:false,source:null,sourceLabel:'',live:false,mySubs:false,
+         view:'browse',shorts:[],shortIndex:0,shortsLoading:false,channelTab:'videos',offFilter:'All',offQuery:''};
+const PH='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 480 270%22%3E%3Crect width=%22480%22 height=%22270%22 fill=%22%23262626%22/%3E%3Cpath d=%22M212 110l58 25-58 25z%22 fill=%22%23555%22/%3E%3C/svg%3E';
+const grid=$('grid'),chipsEl=$('chips'),sidebar=$('sidebar'),watchView=$('watchView'),browseView=$('browseView'),shortsView=$('shortsView'),channelView=$('channelView'),playablesView=$('playablesView');
+let toastTimer;
+function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3800);}
+/*=========================== normalize API shapes ===========================*/
+function txt(v){
+  if(!v) return '';
+  if(typeof v==='string') return v;
+  if(typeof v.simpleText==='string') return v.simpleText;
+  if(Array.isArray(v.runs)) return v.runs.map(r=>r.text||'').join('');
+  if(typeof v.text==='string') return v.text;
+  if(typeof v.content==='string') return v.content;
+  return '';
+}
+function pickThumb(t){
+  if(!t) return '';
+  let a=Array.isArray(t)?t:Object.values(t);
+  a=a.filter(x=>x&&x.url);
+  if(!a.length) return '';
+  a.sort((x,y)=>(x.width||0)-(y.width||0));
+  const ok=a.filter(x=>(x.width||9999)<=640);
+  const use=ok.length?ok:a;
+  return use[use.length-1].url;
+}
+function parseCount(s){
+  const m=String(s==null?'':s).replace(/,/g,'').match(/([\d.]+)\s*([KMB])?/i);
+  if(!m) return 0;
+  let n=parseFloat(m[1])||0;const u=(m[2]||'').toUpperCase();
+  if(u==='K')n*=1e3;else if(u==='M')n*=1e6;else if(u==='B')n*=1e9;
+  return Math.round(n);
+}
+function parseLen(s){const p=String(s||'').split(':').map(Number);return p.some(isNaN)?0:p.reduce((a,b)=>a*60+b,0);}
+function relFrom(iso){
+  if(!iso) return '';
+  const d=(Date.now()-new Date(iso).getTime())/1000;
+  if(!isFinite(d)||d<0) return '';
+  const u=[[31536000,'year'],[2592000,'month'],[604800,'week'],[86400,'day'],[3600,'hour'],[60,'minute']];
+  for(const p of u){if(d>=p[0]){const v=Math.floor(d/p[0]);return v+' '+p[1]+(v>1?'s':'')+' ago';}}
+  return 'just now';
+}
+function normalize(raw){
+  if(!raw) return null;
+  const v=raw.video||raw.videoRenderer||raw.videoWithContextRenderer||raw;
+  const sn=v.snippet||raw.snippet||{};
+  const vid=v.videoId||raw.videoId||(v.id&&v.id.videoId)||(typeof v.id==='string'?v.id:'')||(sn.resourceId&&sn.resourceId.videoId)||'';
+  if(!vid||typeof vid!=='string') return null;
+  const ch=v.channel||sn.channel||{};
+  const channelName=txt(ch.title)||txt(v.author)||txt(v.channelTitle)||txt(sn.channelTitle)||txt(v.ownerText)||txt(sn.videoOwnerChannelTitle)||'YouTube';
+  let views=Number(v.stats&&v.stats.views);
+  if(!isFinite(views)) views=Number(v.viewCount!=null?v.viewCount:sn.viewCount);
+  if(!isFinite(views)) views=parseCount(txt(v.viewCountText)||txt(sn.viewCountText)||txt(v.viewCountText));
+  const len=Number(v.lengthSeconds)||parseLen(txt(v.lengthText)||txt(sn.lengthText));
+  const published=txt(v.publishedText)||txt(v.publishedTimeText)||txt(sn.publishedTime)||relFrom(sn.publishedAt);
+  const badges=(Array.isArray(v.badges)?v.badges:[]).map(b=>txt(b)||txt(b&&b.metadataBadgeRenderer&&b.metadataBadgeRenderer.label)).filter(Boolean).slice(0,2);
+  if(v.hasCaptions&&badges.indexOf('CC')<0) badges.push('CC');
+  const out={
+    id:vid,
+    title:txt(v.title)||txt(sn.title)||'Untitled video',
+    thumb:pickThumb(v.videoThumbnails||v.thumbnails||sn.thumbnails)||('https://i.ytimg.com/vi/'+vid+'/hqdefault.jpg'),
+    channelName:channelName,
+    channelId:v.authorId||v.channelId||(ch&&ch.id)||(sn.channelId)||'',
+    channelAvatar:pickThumb(ch.thumbnails||v.authorThumbnails||[]),
+    views:isFinite(views)?views:0,
+    lengthSeconds:len||0,
+    publishedTimeText:published||'',
+    badges:badges.slice(0,2),
+    live:!!(v.liveNow||v.isLiveNow||v.live||(v.stats&&v.stats.isLive))
+  };
+  if(!out.channelAvatar&&CHANNELS[out.channelId]) out.channelAvatar=CHANNELS[out.channelId].avatar||'';
+  if(out.channelId){
+    const c=CHANNELS[out.channelId]||(CHANNELS[out.channelId]={});
+    c.name=out.channelName;
+    if(out.channelAvatar) c.avatar=out.channelAvatar;
+  }
+  VIDEOS[vid]=out;
+  return out;
+}
+function extract(data){
+  if(!data) return [];
+  let a=Array.isArray(data)?data:(data.contents||data.items||data.videos||data.results||(data.data&&(data.data.contents||data.data.items))||[]);
+  if(a&&!Array.isArray(a)&&Array.isArray(a.contents)) a=a.contents;
+  if(!Array.isArray(a)) return [];
+  return a.map(normalize).filter(Boolean);
+}
+/*=========================== API ===========================*/
+function getJSON(url,ms,headers){
+  const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),ms||9000);
+  return fetch(url,{headers:headers||{},signal:ctl.signal})
+    .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .finally(()=>clearTimeout(timer));
+}
+async function getJSONRetry(url,ms){
+  try{return await getJSON(url,ms);}
+  catch(e){return await getJSON(url,ms);}
+}
+const LIVE_SOURCES=[
+  {id:'invidious',label:'Invidious',run:async(q,cur)=>{
+    const page=Math.max(1,Number(cur)||1);
+    const url=q
+      ? INV_HOST+'/api/v1/search?q='+encodeURIComponent(q)+'&type=video&page='+page
+      : INV_HOST+'/api/v1/trending?type=Video&region=US';
+    const data=await getJSON(url,9000);
+    const items=extract(data);
+    return {items:items,cursorNext:q&&items.length>=10?String(page+1):null};
+  }},
+  {id:'rapid-v31',label:'RapidAPI',run:async(q,cur)=>{
+    const host='youtube-v31.p.rapidapi.com';
+    const url='https://'+host+'/search?part=snippet&q='+encodeURIComponent(q||'wwe')+'&maxResults=32'+(cur?'&cursor='+encodeURIComponent(cur):'');
+    const data=await getJSON(url,4500,{'X-RapidAPI-Key':RAPID_KEY,'X-RapidAPI-Host':host});
+    return {items:extract(data),cursorNext:data.cursorNext||data.cursor||null};
+  }},
+  {id:'rapid-v2',label:'RapidAPI v2',run:async(q,cur)=>{
+    const host='youtube-v2.p.rapidapi.com';
+    const url='https://'+host+'/search/?query='+encodeURIComponent(q||'wwe')+(cur?'&cursor='+encodeURIComponent(cur):'');
+    const data=await getJSON(url,4500,{'X-RapidAPI-Key':RAPID_KEY,'X-RapidAPI-Host':host});
+    return {items:extract(data),cursorNext:data.nextPageToken||data.cursor||null};
+  }}
+];
+async function apiSearch(q,cursor,append){
+  /* On "load more", stay on the source that produced the first page so the
+     continuation token/page number stays meaningful. Otherwise race all
+     sources and use whichever answers first (RapidAPI key still gets tried). */
+  const sources=(append&&S.source)?LIVE_SOURCES.filter(s=>s.id===S.source):LIVE_SOURCES;
+  const jobs=sources.map(async src=>{
+    const out=await src.run(q||'',cursor);
+    if(!out.items||!out.items.length) throw new Error(src.id+' -> no video results');
+    return {src:src,out:out};
+  });
+  let winner;
+  try{winner=await Promise.any(jobs);}
+  catch(e){throw new Error('All video sources unavailable');}
+  S.source=winner.src.id;S.sourceLabel=winner.src.label;S.live=true;
+  return winner.out;
+}
+function setStatus(){
+  const dot=$('apiDot'),tx=$('apiText');
+  if(!dot) return;
+  dot.classList.toggle('off',!S.live);
+  tx.textContent=S.live?('live · '+S.sourceLabel):'offline';
+  tx.title=S.live?('Video data from '+S.sourceLabel):'Using the cached demo feed — live sources are unreachable';
+}
+async function loadFeed(q,append,silent){
+  if(S.loading) return;
+  if(!append){S.query=q;S.cursor=null;renderSkeletons();}
+  S.loading=true;
+  try{
+    const out=await apiSearch(q||'',append?S.cursor:null,append);
+    if(append){
+      const seen=new Set(S.items.map(v=>v.id));
+      const add=out.items.filter(v=>!seen.has(v.id));
+      S.items=S.items.concat(add);
+      grid.insertAdjacentHTML('beforeend',add.map(cardHTML).join(''));
+    }else{
+      S.items=out.items;
+      grid.innerHTML=S.items.map(cardHTML).join('');
+    }
+    S.cursor=out.cursorNext;S.live=true;
+  }catch(err){
+    console.error('[YouTube clone]',err);
+    if(!append){
+      S.items=SEED.map(v=>Object.assign({},v));
+      grid.innerHTML=S.items.map(cardHTML).join('');
+      S.cursor=null;S.live=false;
+      if(!silent){S.query='';renderChips();toast('Live API unavailable — showing the cached WWE demo feed');}
+      else{S.source=null;S.sourceLabel='';}
+    }else{S.cursor=null;}
+  }finally{
+    S.loading=false;setStatus();buildSubscriptions();renderChips();
+  }
+}
+/*=========================== render: cards ===========================*/
+function badgesHTML(v){
+  const b=[];
+  if(v.live) b.push('<span class="badge-live">Live</span>');
+  if(!v.live&&(v.badges||[]).some(x=>/^cc$/i.test(String(x)))) b.push('<span class="badge-cc">CC</span>');
+  if(!v.live) b.push('<span class="dur">'+fmtDur(v.lengthSeconds)+'</span>');
+  return b.join('');
+}
+function chanAttrs(v){return ' data-cid="'+esc(v.channelId||'')+'" data-cname="'+esc(v.channelName||'')+'"';}
+function cardHTML(v){
+  return '<div class="card" data-id="'+esc(v.id)+'" role="link" tabindex="0">'
+  +'<div class="thumb"><img src="'+esc(v.thumb)+'" alt="" loading="lazy" onload="if(this.naturalWidth<160)this.src=\''+PH+'\'" onerror="this.onerror=null;this.src=\''+PH+'\'">'
+  +'<div class="badges">'+badgesHTML(v)+'</div></div>'
+  +'<div class="card-body"><span class="chan-hit av-hit"'+chanAttrs(v)+'>'+avatarHTML(v.channelName,v.channelAvatar,36)+'</span>'
+  +'<div class="card-text"><h3 class="card-title">'+esc(v.title)+'</h3>'
+  +'<div class="card-meta"><span class="chan-hit"'+chanAttrs(v)+'>'+esc(v.channelName)+'</span>'
+  +'<span>'+fmtViews(v.views)+(v.publishedTimeText?' • '+esc(v.publishedTimeText):'')+'</span></div>'
+  +'</div></div></div>';
+}
+function compactHTML(v){
+  return '<div class="compact" data-id="'+esc(v.id)+'" role="link" tabindex="0">'
+  +'<div class="thumb"><img src="'+esc(v.thumb)+'" alt="" loading="lazy" onload="if(this.naturalWidth<160)this.src=\''+PH+'\'" onerror="this.onerror=null;this.src=\''+PH+'\'">'
+  +'<div class="badges">'+badgesHTML(v)+'</div></div>'
+  +'<div class="card-text"><h3 class="card-title">'+esc(v.title)+'</h3>'
+  +'<div class="card-meta"><span class="chan-hit"'+chanAttrs(v)+'>'+esc(v.channelName)+'</span>'
+  +'<span>'+fmtViews(v.views)+(v.publishedTimeText?' • '+esc(v.publishedTimeText):'')+'</span></div>'
+  +'</div></div>';
+}
+function renderSkeletons(){
+  let h='';
+  for(let i=0;i<12;i++){
+    h+='<div class="card"><div class="thumb sk-thumb"></div><div class="card-body">'
+    +'<div class="avatar sk-av"></div><div class="card-text" style="flex:1">'
+    +'<div class="sk-line" style="width:94%"></div><div class="sk-line" style="width:66%"></div>'
+    +'<div class="sk-line" style="width:40%;margin-bottom:0"></div></div></div></div>';
+  }
+  grid.innerHTML=h;
+}
+function renderChips(){
+  const q=String(S.query||'').toLowerCase();
+  chipsEl.innerHTML=CHIPS.map(c=>{
+    const on=c==='All'?!q:c.toLowerCase()===q;
+    return '<button class="chip'+(on?' active':'')+'" data-chip="'+esc(c)+'">'+esc(c)+'</button>';
+  }).join('');
+}
+/*=========================== render: sidebar ===========================*/
+function navBtn(k,l,ic){
+  return '<button class="nav-item" data-nav="'+k+'">'+Svg(ic)+'<span class="label">'+esc(l)+'</span></button>';
+}
+function buildSubscriptions(){
+  const box=$('subList');
+  if(!box) return;
+  const names=[];
+  S.items.forEach(v=>{if(v.channelName&&names.indexOf(v.channelName)<0)names.push(v.channelName);});
+  FALLBACK_SUBS.forEach(n=>{if(names.length<5&&names.indexOf(n)<0)names.push(n);});
+  box.innerHTML=names.slice(0,6).map(n=>{
+    const hit=S.items.find(x=>x.channelName===n&&x.channelId);
+    return '<button class="nav-item sub-channel" data-channel="'+esc(n)+'" data-cid="'+esc(hit?hit.channelId:'')+'">'
+      +avatarHTML(n,'',24)+'<span class="label">'+esc(n)+'</span></button>';
+  }).join('');
+}
+function renderSidebar(){
+  const you=[['history','History','history'],['playlist','Playlists','playlist'],['videos','Your videos','video'],['later','Watch later','clock'],['liked','Liked videos','like'],['downloads','Downloads','download']];
+  const explore=[['trending','Trending','fire'],['music','Music','music'],['gaming','Gaming','game'],['playables','Playables','playables'],['news','News','news'],['sport','Sports','sport']];
+  const settings=[['settings','Settings','gear'],['report','Report history','flag'],['help','Help','help'],['feedback','Send feedback','feedback']];
+  let h='<div class="nav-section">'+navBtn('home','Home','home')+navBtn('shorts','Shorts','shorts')+navBtn('subs','Subscriptions','subs')+'</div>';
+  h+='<div class="nav-divider mini-hide"></div>';
+  h+='<div class="nav-title mini-hide">You</div>';
+  h+='<div class="nav-section mini-hide">'+you.map(x=>navBtn(x[0],x[1],x[2])).join('')+'</div>';
+  h+='<div class="nav-divider mini-hide"></div>';
+  h+='<div class="nav-title mini-hide">Subscriptions</div>';
+  h+='<div class="nav-section mini-hide" id="subList"></div>';
+  h+='<div class="nav-divider mini-hide"></div>';
+  h+='<div class="nav-title mini-hide">Explore</div>';
+  h+='<div class="nav-section mini-hide">'+explore.map(x=>navBtn(x[0],x[1],x[2])).join('')+'</div>';
+  h+='<div class="nav-divider mini-hide"></div>';
+  h+='<div class="nav-section mini-hide">'+settings.map(x=>navBtn(x[0],x[1],x[2])).join('')+'</div>';
+  h+='<div class="side-footer mini-hide">About Press Copyright<br>Contact us Creators Advertise Developers<br>'
+    +'Terms Privacy Policy &amp; Safety<br>How YouTube works Test new features'
+    +'<b>© 2026 YouTube — interface recreation</b></div>';
+  sidebar.innerHTML=h;
+  buildSubscriptions();
+}
+/*=========================== render: watch ===========================*/
+function renderWatch(id){
+  const found=VIDEOS[id]||S.items.find(x=>x.id===id);
+  const v=found||{
+    id:id,title:'YouTube video',thumb:'https://i.ytimg.com/vi/'+id+'/hqdefault.jpg',
+    channelName:'YouTube',channelAvatar:'',views:0,lengthSeconds:0,publishedTimeText:'',badges:[],live:false
+  };
+  if(S.current===v&&!watchView.hidden) return;
+  S.current=v;
+  S.view='watch';
+  document.title=v.title+' - YouTube';
+  cleanupGame();
+  browseView.hidden=true;
+  shortsView.hidden=true;
+  channelView.hidden=true;
+  playablesView.hidden=true;
+  watchView.hidden=false;
+  let rel=S.items.filter(x=>x.id!==v.id);
+  if(v.channelId){
+    const same=rel.filter(x=>x.channelId===v.channelId);
+    if(same.length>=3) rel=same.concat(rel.filter(x=>x.channelId!==v.channelId));
+  }
+  rel=rel.slice(0,14);
+  const desc=v.title+'\n\n'+v.channelName+' • '+fmtViews(v.views)+(v.publishedTimeText?' • '+v.publishedTimeText:'')
+    +'\n\nThis page is a front-end recreation of YouTube, rebuilt with plain HTML, CSS and JavaScript. '
+    +'Layout, theme, navigation and the watch page were recreated from scratch. Video metadata is loaded live from '
+    +'public YouTube metadata APIs, with a cached feed as fallback.\n\n#YouTube';
+  watchView.innerHTML=
+   '<div class="watch">'
+  +'<div class="watch-main">'
+  +'<div class="player" id="playerBox"><img class="poster" src="'+esc(v.thumb)+'" alt="">'
+  +'<button class="play-btn" id="playBtn" aria-label="Play video">'+Svg('play',26)+'</button></div>'
+  +'<h1 class="watch-title">'+esc(v.title)+'</h1>'
+  +'<div class="channel-row"><div class="channel-left"><span class="chan-hit av-hit"'+chanAttrs(v)+'>'+avatarHTML(v.channelName,v.channelAvatar,40)+'</span>'
+  +'<div><div class="channel-name chan-hit"'+chanAttrs(v)+'>'+esc(v.channelName)+'</div><div class="channel-subs">'+subsFor(v.channelName)+'</div></div>'
+  +'<button class="sub-btn" id="subBtn">Subscribe</button></div>'
+  +'<div class="actions">'
+  +'<div class="pill-group"><button class="pg-btn" id="likeBtn">'+Svg('like')+'<span id="likeCount">'+likesFor(v)+'</span></button>'
+  +'<span class="pg-sep"></span><button class="pg-btn down" id="dislikeBtn" aria-label="Dislike">'+Svg('dislike')+'</button></div>'
+  +'<button class="action-pill" id="shareBtn">'+Svg('share')+'<span class="txt">Share</span></button>'
+  +'<button class="action-pill" id="dlBtn">'+Svg('download')+'<span class="txt">Download</span></button>'
+  +'<button class="action-pill" id="clipBtn">'+Svg('cut')+'<span class="txt">Clip</span></button>'
+  +'<button class="action-pill icon-only" id="moreBtn" aria-label="More">'+Svg('more')+'</button>'
+  +'</div></div>'
+  +'<div class="desc" id="desc"><div class="desc-meta">'+fmtViews(v.views)+(v.publishedTimeText?' • '+esc(v.publishedTimeText):'')+'</div>'
+  +'<p class="desc-text">'+esc(desc)+'</p><button class="desc-toggle">...more</button></div>'
+  +'<div class="comments"><div class="comments-head"><span>'+commentsFor(v)+' Comments</span>'
+  +'<button class="sort-btn" id="sortBtn">'+Svg('sort',22)+'Sort by</button></div>'
+  +'<div class="comment-box">'+avatarHTML('Constance','',40)
+  +'<div class="comment-form"><input class="comment-input" id="commentInput" placeholder="Add a comment…" aria-label="Add a comment">'
+  +'<div class="comment-actions" id="commentActions" hidden>'
+  +'<button class="text-btn" id="commentCancel">Cancel</button>'
+  +'<button class="sub-btn sm" id="commentSend">Comment</button></div></div></div>'
+  +'<div id="commentList"></div></div>'
+  +'</div>'
+  +'<aside class="watch-side"><div class="side-title">Up next</div>'+rel.map(compactHTML).join('')+'</aside>'
+  +'</div>';
+  bindWatch(v);
+  window.scrollTo(0,0);
+}
+/*=========================== watch interactions ===========================*/
+function bindWatch(v){
+  $('playerBox').addEventListener('click',function(e){
+    if(e.target.tagName==='IFRAME') return;
+    this.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)
+      +'?autoplay=1&rel=0" title="'+esc(v.title)+'" allow="accelerometer; autoplay; clipboard-write; '
+      +'encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+  });
+  const desc=$('desc');
+  desc.addEventListener('click',()=>{
+    desc.classList.toggle('open');
+    const t=desc.querySelector('.desc-toggle');
+    if(t) t.textContent=desc.classList.contains('open')?'Show less':'...more';
+  });
+  const likeBtn=$('likeBtn'),disBtn=$('dislikeBtn');
+  likeBtn.addEventListener('click',()=>{likeBtn.classList.toggle('liked');});
+  disBtn.addEventListener('click',()=>{disBtn.classList.toggle('liked');});
+  $('subBtn').addEventListener('click',function(){
+    const on=this.classList.toggle('on');
+    this.textContent=on?'Subscribed':'Subscribe';
+    toast(on?'Subscribed to '+v.channelName:'Unsubscribed from '+v.channelName);
+  });
+  $('shareBtn').addEventListener('click',async()=>{
+    const url=location.href;
+    try{await navigator.clipboard.writeText(url);toast('Link copied to clipboard');}
+    catch(e){toast(url);}
+  });
+  $('dlBtn').addEventListener('click',()=>toast('Download is not available in this recreation'));
+  $('clipBtn').addEventListener('click',()=>toast('Clip is not available in this recreation'));
+  $('moreBtn').addEventListener('click',()=>toast('More actions are not available in this recreation'));
+  $('sortBtn').addEventListener('click',()=>toast('Showing top comments'));
+  const input=$('commentInput'),acts=$('commentActions'),list=$('commentList');
+  input.addEventListener('focus',()=>{acts.hidden=false;});
+  $('commentCancel').addEventListener('click',()=>{acts.hidden=true;input.value='';input.blur();});
+  $('commentSend').addEventListener('click',()=>{
+    const text=input.value.trim();
+    if(!text){toast('Add a comment first');return;}
+    const el=document.createElement('div');
+    el.className='comment-item';
+    el.innerHTML=avatarHTML('Constance','',40)+'<div class="comment-body"><div class="comment-head"><b>@constance</b><span>now</span></div><div class="comment-text"></div></div>';
+    el.querySelector('.comment-text').textContent=text;
+    list.prepend(el);
+    acts.hidden=true;input.value='';input.blur();
+    toast('Comment added');
+  });
+}
+/*=========================== shorts ===========================*/
+let CH_ID='',CH_NAME='';
+function seedShorts(){
+  const out=SHORT_SEED.map(r=>({
+    id:r[0],title:r[1],channelName:r[2],channelId:r[3],channelAvatar:CHANNEL_AVATARS[r[3]]||'',
+    thumb:'https://i.ytimg.com/vi/'+r[0]+'/hqdefault.jpg',views:0,lengthSeconds:60,
+    publishedTimeText:'',badges:[],live:false
+  }));
+  out.forEach(v=>{VIDEOS[v.id]=v;});
+  return shuffle(out);
+}
+async function fetchShorts(forceId){
+  /* Pick a random set of channels every time so the FYP never settles into
+     one language or one niche. A linked Short forces its own channel in. */
+  const force=forceId&&VIDEOS[forceId]?VIDEOS[forceId].channelId:'';
+  let ids=shuffle(SHORT_CHANNELS.filter(id=>id!==force));
+  if(force) ids.unshift(force);
+  ids=ids.slice(0,12);
+  const jobs=ids.map(async id=>{
+    const cached=CHANNELS[id]||{};
+    const data=await getJSONRetry(INV_HOST+'/api/v1/channels/'+encodeURIComponent(id)+'/shorts',9000).catch(()=>({videos:[]}));
+    return shuffle((data.videos||[]).map(normalize)
+      .filter(v=>v&&(!v.lengthSeconds||v.lengthSeconds<=180))
+      .map(v=>{
+        v.channelId=v.channelId||id;
+        if(!v.channelName||v.channelName==='YouTube') v.channelName=cached.name||'';
+        if(!v.channelAvatar) v.channelAvatar=CHANNEL_AVATARS[id]||cached.avatar||'';
+        if(v.channelAvatar&&!cached.avatar) cached.avatar=v.channelAvatar;
+        return v;
+      })).slice(0,6);
+  });
+  const lists=await Promise.all(jobs);
+  const items=[],seen=new Set();
+  shuffle(lists).forEach(list=>list.forEach(v=>{if(!seen.has(v.id)){seen.add(v.id);items.push(v);}}));
+  return shuffle(items);
+}
+function shortHTML(v,i){
+  return '<section class="short-item" data-index="'+i+'">'
+  +'<div class="short-stage" data-short="'+esc(v.id)+'">'
+  +'<img class="poster" src="'+esc(v.thumb)+'" alt="" loading="lazy" onerror="this.onerror=null;this.src=\''+PH+'\'">'
+  +'<button class="short-play" aria-label="Play short">'+Svg('play',30)+'</button></div>'
+  +'<div class="short-info">'
+  +'<div class="short-channel"'+chanAttrs(v)+'>'+avatarHTML(v.channelName,v.channelAvatar,40)
+  +'<span class="short-channel-name">'+esc(v.channelName)+'</span>'
+  +'<button class="short-sub-btn">Subscribe</button></div>'
+  +'<p class="short-title">'+esc(v.title)+'</p>'
+  +'<div class="short-actions">'
+  +'<button class="short-act" data-act="like" aria-label="Like">'+Svg('like',22)+'</button>'
+  +'<button class="short-act" data-act="dislike" aria-label="Dislike">'+Svg('dislike',22)+'</button>'
+  +'<button class="short-act" data-act="comment" aria-label="Comments">'+Svg('comment',22)+'</button>'
+  +'<button class="short-act" data-act="share" aria-label="Share">'+Svg('share',22)+'</button>'
+  +'<button class="short-act" data-act="more" aria-label="More">'+Svg('more',22)+'</button>'
+  +'</div></div></section>';
+}
+function shortsShell(){
+  shortsView.innerHTML='<div class="shorts">'
+  +'<div class="shorts-head"><h2>'+Svg('shorts',24)+' Shorts</h2><div class="spacer"></div>'
+  +'<button class="shorts-refresh">'+Svg('refresh',18)+' Refresh</button>'
+  +'<button class="shorts-back">'+Svg('back',18)+' Back</button></div>'
+  +'<div class="shorts-scroll" id="shortsScroll"><div class="empty">Loading Shorts…</div></div>'
+  +'<div class="short-nav"><button id="shortUp" aria-label="Previous short">'+Svg('up')+'</button>'
+  +'<button id="shortDown" aria-label="Next short">'+Svg('down')+'</button></div></div>';
+  const sc=$('shortsScroll');
+  let ticking=false;
+  sc.addEventListener('scroll',()=>{
+    if(ticking) return;
+    ticking=true;
+    requestAnimationFrame(()=>{
+      ticking=false;
+      const i=Math.max(0,Math.min(S.shorts.length-1,Math.round(sc.scrollTop/sc.clientHeight)));
+      if(i!==S.shortIndex){
+        /* Stop the previous short when scrolling away, like the real app. */
+        sc.querySelectorAll('.short-stage iframe').forEach(f=>{
+          const stage=f.parentNode,src=f.src.match(/embed\/([^?]+)/);
+          if(src){const id=decodeURIComponent(src[1]);const v=S.shorts.find(x=>x.id===id);
+            stage.innerHTML='<img class="poster" src="'+esc(v?v.thumb:'')+'" alt="" onerror="this.onerror=null;this.src=\''+PH+'\'"><button class="short-play" aria-label="Play short">'+Svg('play',30)+'</button>';}
+        });
+        S.shortIndex=i;updateShortNav();
+      }
+    });
+  },{passive:true});
+}
+function updateShortNav(){
+  const u=$('shortUp'),d=$('shortDown');
+  if(u) u.disabled=S.shortIndex<=0;
+  if(d) d.disabled=S.shortIndex>=S.shorts.length-1;
+}
+function renderShortList(){
+  const sc=$('shortsScroll');
+  if(!sc) return;
+  sc.innerHTML=S.shorts.map(shortHTML).join('')||'<div class="empty"><b>No Shorts available</b>Could not load Shorts from the live API.</div>';
+  sc.scrollTop=S.shortIndex*sc.clientHeight;
+  updateShortNav();
+}
+function scrollShort(delta){
+  const sc=$('shortsScroll');
+  if(!sc||!S.shorts.length) return;
+  const next=Math.max(0,Math.min(S.shorts.length-1,S.shortIndex+delta));
+  S.shortIndex=next;
+  sc.scrollTo({top:next*sc.clientHeight,behavior:'smooth'});
+  updateShortNav();
+}
+function playShort(id,stage){
+  if(stage.querySelector('iframe')) return;
+  stage.innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)
+    +'?autoplay=1&rel=0&playsinline=1" title="Short" allow="accelerometer; autoplay; clipboard-write; '
+    +'encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+}
+async function loadShorts(forceId){
+  if(S.shortsLoading) return;
+  S.shortsLoading=true;
+  shortsShell();
+  let items=[];
+  try{items=await fetchShorts(forceId);}catch(e){console.warn('[YouTube clone] Shorts source failed',e);}
+  /* The public API is flaky. If too few channels answered, mix in fresh
+     offline picks from the other categories so the FYP stays varied. */
+  if(items.length){
+    const have=new Set(items.map(v=>v.channelId));
+    if(have.size<6){
+      const extra=seedShorts().filter(v=>!have.has(v.channelId)&&!items.some(x=>x.id===v.id));
+      items=shuffle(items.concat(extra.slice(0,24)));
+    }
+  }else items=seedShorts();
+  S.shorts=items;S.shortIndex=0;
+  if(S.view==='shorts') renderShortList();
+  S.shortsLoading=false;
+}
+function showShorts(id){
+  S.view='shorts';
+  cleanupGame();
+  browseView.hidden=true;
+  watchView.hidden=true;
+  channelView.hidden=true;
+  playablesView.hidden=true;
+  shortsView.hidden=false;
+  document.title='Shorts - YouTube';
+  if(isMobile()) setNav('hidden');
+  loadShorts(id).then(()=>{
+    if(id&&S.view==='shorts'){
+      const i=S.shorts.findIndex(v=>v.id===id);
+      if(i>0){S.shortIndex=i;const sc=$('shortsScroll');if(sc)sc.scrollTop=i*sc.clientHeight;updateShortNav();}
+    }
+  });
+}
+shortsView.addEventListener('click',async e=>{
+  if(e.target.closest('.shorts-back')){goHome();return;}
+  if(e.target.closest('.shorts-refresh')){loadShorts();return;}
+  if(e.target.closest('#shortUp')){scrollShort(-1);return;}
+  if(e.target.closest('#shortDown')){scrollShort(1);return;}
+  const sub=e.target.closest('.short-sub-btn');
+  if(sub){
+    e.stopPropagation();
+    const on=sub.textContent.trim()==='Subscribe';
+    sub.textContent=on?'Subscribed':'Subscribe';
+    sub.classList.toggle('on',on);
+    return;
+  }
+  const act=e.target.closest('.short-act');
+  if(act){
+    e.stopPropagation();
+    const kind=act.dataset.act;
+    if(kind==='like'||kind==='dislike'){const other=act.parentNode.querySelector('[data-act="'+(kind==='like'?'dislike':'like')+'"]');if(other)other.classList.remove('liked');act.classList.toggle('liked');}
+    else if(kind==='share'){
+      const item=act.closest('.short-item'),v=S.shorts[Number(item&&item.dataset.index)||0];
+      const url=location.origin+location.pathname+'#shorts='+encodeURIComponent(v?v.id:'');
+      try{await navigator.clipboard.writeText(url);toast('Short link copied to clipboard');}catch(err){toast(url);}
+    }
+    else if(kind==='comment') toast('Comments are not available in the Shorts player');
+    else toast('More actions are not available in this recreation');
+    return;
+  }
+  const stage=e.target.closest('.short-stage');
+  if(stage){playShort(stage.dataset.short,stage);return;}
+  const ch=e.target.closest('[data-cid],[data-cname]');
+  if(ch){e.stopPropagation();openChannel(ch.dataset.cid,ch.dataset.cname);}
+});
+/*=========================== channel page ===========================*/
+function channelSkeleton(){
+  channelView.innerHTML='<div class="channel-banner sk-thumb" style="border-radius:0"></div>'
+  +'<div class="channel-head"><div class="avatar sk-av" style="width:96px;height:96px"></div>'
+  +'<div class="channel-info" style="padding-bottom:12px"><div class="sk-line" style="width:260px;height:24px"></div>'
+  +'<div class="sk-line" style="width:150px"></div><div class="sk-line" style="width:330px"></div></div></div>'
+  +'<div class="grid">'+'<div class="sk-thumb" style="aspect-ratio:16/9"></div>'.repeat(8)+'</div>';
+}
+function renderChannel(id,name,info,videos){
+  CH_ID=id;CH_NAME=name;
+  const cached=CHANNELS[id]||{};
+  const avatar=pickThumb((info&&info.authorThumbnails)||[])||cached.avatar||'';
+  const subCount=(info&&info.subCount)||cached.subs||0;
+  const subs=subCount?fmtShort(subCount)+' subscribers':subsFor(name);
+  const desc=(info&&info.description)||'Welcome to '+name+' — videos, Shorts and more.';
+  const color=colorFor(name);
+  channelView.innerHTML=
+   '<div class="channel-banner" style="background:linear-gradient(115deg,'+color+',#161616)"></div>'
+  +'<div class="channel-head">'+avatarHTML(name,avatar,96)
+  +'<div class="channel-info"><h1 class="channel-name-lg">'+esc(name)+(info&&info.authorVerified?' '+Svg('verified',18):'')+'</h1>'
+  +'<div class="channel-handle">@'+esc(String(name).replace(/\s+/g,'').toLowerCase())+'</div>'
+  +'<div class="channel-stats">'+esc(subs)+(info&&info.totalViews?' • '+fmtViews(info.totalViews):'')+'</div>'
+  +'<div class="channel-desc">'+esc(desc)+'</div></div>'
+  +'<div class="channel-actions"><button class="sub-btn" id="chSub">Subscribe</button>'
+  +'<button class="pill-btn" id="chShorts">'+Svg('shorts',20)+' Shorts</button></div></div>'
+  +'<div class="channel-tabs"><button class="channel-tab active" data-tab="videos">Videos</button>'
+  +'<button class="channel-tab" data-tab="shorts">Shorts</button></div>'
+  +'<div id="chGrid" class="grid" style="padding-top:20px"></div>';
+  const g=$('chGrid');
+  g.innerHTML=videos.map(cardHTML).join('')||'<div class="empty"><b>No videos yet</b>This channel has no uploaded videos available.</div>';
+}
+async function showChannel(key,name){
+  S.view='channel';
+  cleanupGame();
+  browseView.hidden=true;watchView.hidden=true;shortsView.hidden=true;playablesView.hidden=true;channelView.hidden=false;
+  document.title=(name||'Channel')+' - YouTube';
+  if(isMobile()) setNav('hidden');
+  channelSkeleton();
+  try{
+    let id=key||'',nm=name||'',info=null,videos=[];
+    if(/^UC[\w-]{10,}$/.test(id)){
+      const pair=await Promise.all([
+        getJSONRetry(INV_HOST+'/api/v1/channels/'+encodeURIComponent(id),9000).catch(()=>null),
+        getJSONRetry(INV_HOST+'/api/v1/channels/'+encodeURIComponent(id)+'/videos',9000).catch(()=>null)
+      ]);
+      info=pair[0];videos=extract(pair[1]||{});
+      if(!videos.length){
+        /* The public API sometimes drops a request. Try Shorts, then anything
+           already cached for this channel, so the profile is never empty. */
+        const sh=await getJSON(INV_HOST+'/api/v1/channels/'+encodeURIComponent(id)+'/shorts',9000).catch(()=>null);
+        videos=extract(sh||{});
+      }
+      if(!videos.length) videos=Object.keys(VIDEOS).map(k=>VIDEOS[k]).filter(v=>v.channelId===id);
+      nm=(info&&info.author)||nm||'Channel';
+    }else{
+      const q=id||nm||'channel';
+      const data=await getJSONRetry(INV_HOST+'/api/v1/search?q='+encodeURIComponent(q)+'&type=video',9000).catch(()=>null);
+      videos=extract(data||[]);
+      const found=(Array.isArray(data)?data:[]).find(x=>x&&x.authorId)||(Array.isArray(data)?data:[])[0];
+      if(found&&found.authorId){
+        id=found.authorId;nm=found.author||nm||q;
+        info=await getJSONRetry(INV_HOST+'/api/v1/channels/'+encodeURIComponent(id),9000).catch(()=>null);
+        const more=await getJSONRetry(INV_HOST+'/api/v1/channels/'+encodeURIComponent(id)+'/videos',9000).catch(()=>null);
+        if(more&&extract(more).length) videos=extract(more);
+      }else{nm=nm||q;}
+    }
+    if(!info&&CHANNELS[id]){
+      const c=CHANNELS[id];
+      info={author:c.name||nm,authorThumbnails:c.avatar?[{url:c.avatar,width:176,height:176}]:[],
+            subCount:c.subs||0,authorVerified:!!c.verified,description:c.desc||''};
+    }
+    renderChannel(id,nm,info,videos);
+  }catch(err){
+    console.error('[YouTube clone] Channel load failed',err);
+    channelView.innerHTML='<div class="empty"><b>Channel unavailable</b>Could not load this profile right now.</div>';
+  }
+}
+channelView.addEventListener('click',async e=>{
+  if(e.target.closest('#chSub')){
+    const b=$('chSub'),on=b.textContent.trim()==='Subscribe';
+    b.textContent=on?'Subscribed':'Subscribe';
+    b.classList.toggle('on',on);
+    toast(on?'Subscribed to '+CH_NAME:'Unsubscribed from '+CH_NAME);
+    return;
+  }
+  if(e.target.closest('#chShorts')){
+    const tab=channelView.querySelector('[data-tab="shorts"]');
+    if(tab) tab.click();
+    return;
+  }
+  const tab=e.target.closest('.channel-tab');
+  if(tab){
+    channelView.querySelectorAll('.channel-tab').forEach(t=>t.classList.toggle('active',t===tab));
+    const g=$('chGrid');
+    if(!g) return;
+    if(tab.dataset.tab==='videos'){
+      const data=await getJSONRetry(INV_HOST+'/api/v1/channels/'+encodeURIComponent(CH_ID)+'/videos',9000).catch(()=>null);
+      let list=extract(data||{});
+      if(!list.length){
+        const sh=await getJSON(INV_HOST+'/api/v1/channels/'+encodeURIComponent(CH_ID)+'/shorts',9000).catch(()=>null);
+        list=extract(sh||{});
+      }
+      if(!list.length) list=Object.keys(VIDEOS).map(k=>VIDEOS[k]).filter(v=>v.channelId===CH_ID);
+      g.innerHTML=list.map(cardHTML).join('')||'<div class="empty">No videos available.</div>';
+    }else{
+      const data=await getJSONRetry(INV_HOST+'/api/v1/channels/'+encodeURIComponent(CH_ID)+'/shorts',9000).catch(()=>null);
+      g.innerHTML=extract(data||{}).map(cardHTML).join('')||'<div class="empty">This channel has no Shorts.</div>';
+    }
+    return;
+  }
+  const ch=e.target.closest('[data-cid],[data-cname]');
+  if(ch){e.stopPropagation();openChannel(ch.dataset.cid,ch.dataset.cname);}
+});
+function openChannel(id,name){
+  const key=id||name||'';
+  if(!key) return;
+  const h='#channel='+encodeURIComponent(key);
+  if(location.hash===h){showChannel(key,name);return;}
+  history.pushState(null,'',h);
+  showChannel(key,name);
+}
+/*=========================== playables ===========================*/
+const GAMES=[
+ {id:'2048',title:'2048',category:'Puzzle',desc:'Slide tiles, merge numbers, reach 2048.',icon:'🔢',c1:'#f6b73c',c2:'#e08d24'},
+ {id:'snake',title:'Snake',category:'Arcade',desc:'Grow longer without hitting yourself.',icon:'🐍',c1:'#66bb6a',c2:'#2e7d32'},
+ {id:'memory',title:'Memory Match',category:'Puzzle',desc:'Flip cards and find all eight pairs.',icon:'🧠',c1:'#9575cd',c2:'#5e35b1'},
+ {id:'mole',title:'Whack-a-Mole',category:'Arcade',desc:'Tap the moles before they duck away.',icon:'🔨',c1:'#ef6c60',c2:'#c62828'},
+ {id:'breaker',title:'Brick Breaker',category:'Arcade',desc:'Bounce the ball and clear every brick.',icon:'🧱',c1:'#4fc3f7',c2:'#1565c0'}
+];
+/* Official Playables catalog data from https://github.com/bubbls/youtube-playables */
+const OFFICIAL_GAMES=[{"id":"UgkxhP1qCWVdu3k_pTzBJwtt5gqBXsnIbs6O","t":"2048 Fusion","d":"2048 solving game.","g":"Board & Card","p":"GameSnacks","dt":"Aug 20, 2024","i":"https://7t79nelq6lu50.h5games.usercontent.goog/v/7k3rvgqip7sdg/images/fusion-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxhP1qCWVdu3k_pTzBJwtt5gqBXsnIbs6O","r":"https://7t79nelq6lu50.h5games.usercontent.goog/v/7k3rvgqip7sdg"},{"id":"Ugkxhiv8Y9r74rPZCYfabW2o0hicnoEK_kgX","t":"3D Bowling","d":"3D Bowling Classic is the ultimate bowling experience! Train your skills in this addictive 3D sports game and knock over all pins to win!","g":"Sports","p":"Famobi","dt":"May 13, 2025","i":"https://yt3.ggpht.com/wSYW9iWhofGAh308G3aanmGw1QV4y1I9G6BM-kkDBbVc_uOmRB49ZPw9ldfLtnjtyRBSyX9Zn8Bd=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxhiv8Y9r74rPZCYfabW2o0hicnoEK_kgX","r":""},{"id":"UgkxrMWCETUzrZskkwqOywiZZ-xjKNjqR5YQ","t":"8 Ball Billiards Classic","d":"Train your billiard skills and play against the computer or your friend in this 8-ball Pool sports game!","g":"Sports","p":"Famobi","dt":"Aug 15, 2023","i":"https://yt3.ggpht.com/s4mh4yuMqd8eeAL_cig-p-14gmrAbeLRknN-RsNCaDkShitWJUNC4b2L602N5Tr176eMit8UU1CNNR8=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxrMWCETUzrZskkwqOywiZZ-xjKNjqR5YQ","r":""},{"id":"UgkxPw0qfpc1rlkwbPLiF_eYy_lv7erWzlsN","t":"99 Balls 3D","d":"Break numbered blocks with your ball. The higher the number the more hits it takes.","g":"Arcade","p":"GameSnacks","dt":"Feb 5, 2024","i":"https://99balls3d.h5games.usercontent.goog/v/ae7fe090-0ff5-4ce9-afd9-b5e573e57f6d/high_res_tall.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxPw0qfpc1rlkwbPLiF_eYy_lv7erWzlsN","r":"https://99balls3d.h5games.usercontent.goog/v/ae7fe090-0ff5-4ce9-afd9-b5e573e57f6d"},{"id":"UgkxhZg1OZV8DMXOTTuELyU_T-7tipA8gfIU","t":"Adorable Home","d":"Adorable Home is a decoration sim. Unlock new rooms in your home and fill them up with adorable furniture while playing mini-games with cute cats!","g":"Simulation","p":"HyperBeard Inc","dt":"Jun 4, 2024","i":"https://yt3.ggpht.com/uX55x-akH8qWT9fXqd9wiIXUIxa8gGtMAUrN9Df8DCqEpBYP2MMNGgvZFJvNZ_mziZ4x8aKHW7eA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxhZg1OZV8DMXOTTuELyU_T-7tipA8gfIU","r":""},{"id":"Ugkxoat5BdVauZ_vZ9LDhLOIdTDGNsP9XfOM","t":"Alien Shooter","d":"Earth's last hope is in your hands, take control of the lone spaceship and protect Earth from alien swarms attack","g":"Action","p":"ABI GAME STUDIO","dt":"Dec 5, 2023","i":"https://yt3.ggpht.com/_za1Q9psMrzZg-rMcuhdBHDs0tnHvSye80iOoWSUVfPXqNjBDDMmBE2NBTHy-PdqOO84JkNlRcfeznc=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxoat5BdVauZ_vZ9LDhLOIdTDGNsP9XfOM","r":""},{"id":"UgkxUoLrmZDFP9DVVq0Jb4Ty3Afx80bBUovv","t":"AMAZE!","d":"Swipe to move the ball and paint - you’ve got to color and paint your way across the AMAZE maze puzzles.","g":"Brain & Puzzle","p":"CrazyLabs","dt":"Dec 19, 2023","i":"https://yt3.ggpht.com/u8pbGLdaNniDDAi1nDDEo-DrBzYT1QOj6qN49-OcmAQ4y2tDnUEaU8bwXzus3A0Jhd2oujrMw_QI=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxUoLrmZDFP9DVVq0Jb4Ty3Afx80bBUovv","r":""},{"id":"Ugkxb2gxwOZu9QDqSZymy8YWhn_NJbg2BQXH","t":"Angry Birds Showdown","d":"Angry Birds Showdown is the Angry Birds game where you go head to head in 1-on-1 battles!","g":"Brain & Puzzle","p":"Rovio Entertainment Oyj","dt":"Apr 26, 2024","i":"https://yt3.ggpht.com/PyffqcYSfUz7tMMEm_4h-N5tqt87GnwkzurI7nBBWb3tzEN9BOekJALiSkOY2Zrm2zuL1GyMblA_9Kk=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxb2gxwOZu9QDqSZymy8YWhn_NJbg2BQXH","r":""},{"id":"UgkxhWL-8PcJnVcWWzTqGWR1UUSXLxoBf5l-","t":"Archery World Tour","d":"Take your bow and arrow and prove your aiming skills to become the Archery Master.","g":"Sports","p":"Famobi","dt":"Jan 21, 2025","i":"https://yt3.ggpht.com/l_AtlrMUKPtJNfhL6I3jRn5B2Pln5UShXatsMUjg2Y-Yl3rAfGo8VKC9dnZEuMZnvNFAIc_RyzuxQQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxhWL-8PcJnVcWWzTqGWR1UUSXLxoBf5l-","r":""},{"id":"UgkxJmwg98icsWuce6d-z6eVUYILlovTRw86","t":"Arena Kingdoms","d":"A friendly auto battler where you pick a Hero, recruit allies from across the Kingdoms, and build a powerful Party to conquer the Gauntlet!","g":"RPG & Strategy","p":"Captain.tv","dt":"Jan 14, 2025","i":"https://yt3.ggpht.com/Hwx_23c_YIz1y4lS1vis_gV4xr-ynVk8n3JE-2XWjSKq9-lmzZrbW45MdrDcL8kQq-htXQ3oHsVOEg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxJmwg98icsWuce6d-z6eVUYILlovTRw86","r":""},{"id":"UgkxilX40LwBis1WdtTChkyvueeqxud-mNy2","t":"Attack Hole","d":"Swallow all the objects to beat the final enemy and progress in the game!","g":"Arcade","p":"Homa","dt":"Jul 30, 2024","i":"https://yt3.ggpht.com/oHBp1GC7afVH4oHtRCQeXowgj5NrMbxnSUGVfyRAotMKaCLE_R7EzMUo4IbwC1hh0srxHkekwpOwNeU=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxilX40LwBis1WdtTChkyvueeqxud-mNy2","r":""},{"id":"UgkxnAS9EVTaa5oTKIIc3gCduqQvLS7PxYbV","t":"Ball Blast","d":"Shoot all the balls! Ball Blast is the perfect game for anyone who loves arcade shooting games.","g":"Arcade","p":"VOODOO","dt":"Aug 20, 2024","i":"https://yt3.ggpht.com/HF_l0BvtMx4FHljHUib2REvTEV2zWyG3VIgBsszcbXpguYBYtZm018EEN7Y8eE9wkEZztTZvNneA6A=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxnAS9EVTaa5oTKIIc3gCduqQvLS7PxYbV","r":""},{"id":"Ugkx1s2VGH_7yX41k3D3p_aLeqBqZ2DGF9hf","t":"Basket Battle","d":"Throw the ball higher. Take it from above the basket and throw into the basket. Hit the opponent to stop him/her throwing the ball into the basket.","g":"Sports","p":"Supersonic Studios","dt":"Sep 10, 2024","i":"https://yt3.ggpht.com/YvDrY-N5cNm6Fjxp2-kaztVg7m70ve5S11b7RBTlxazl_O6sIgB_MgePp2UGV6JR5Pyal4dFGQqnFi4=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx1s2VGH_7yX41k3D3p_aLeqBqZ2DGF9hf","r":""},{"id":"UgkxWSXS6lpJJk8UXStO2_gBWymmyo7GnjZN","t":"Basketball FRVR","d":"Basketball FRVR: Showcase your shooting skills, swish the rim, outscore friends! Embrace the pressure, enjoy the fun, dunk like a PRO. Are you game?","g":"Sports","p":"FRVR","dt":"Aug 16, 2023","i":"https://yt3.ggpht.com/KyEQ1euunVgQroh2VIAp4fzvF5cbOFo98LARKoeatKMr_E6h6jyB6h9cv5HnM1C3EEwSoqRIUghf5Q=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxWSXS6lpJJk8UXStO2_gBWymmyo7GnjZN","r":""},{"id":"UgkxMYb8szzWt5VeS7WoQoXGi1NE6p3GWsYM","t":"Bazooka Boy","d":"Bazooka Boy is a shooting game where you launch missiles at faceless characters throughout each level.","g":"Action","p":"Supersonic Studios LTD","dt":"Feb 27, 2024","i":"https://yt3.ggpht.com/JOvn0f_rvupGD3dKViKJcbR_Qal7Ljv8Mo6fBT0I5tnhZuzqK-FPM2ui-wKln0eAfkPSMDrAl4tymA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxMYb8szzWt5VeS7WoQoXGi1NE6p3GWsYM","r":""},{"id":"UgkxgXYOIm4FNBLx2Pqcsm2uLVNL6-yY9JxN","t":"BlockDrop","d":"Block-Drop is an endless puzzle game with predefined blocks that are randomly given to the player. The objective is to fill rows and columns on a 1…","g":"Brain & Puzzle","p":"GameSnacks","dt":"Feb 6, 2024","i":"https://51vi4vae20f8o.h5games.usercontent.goog/v/66bqinuuh36b8/src/assets/art/store/block-drop-v-1080.1920.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxgXYOIm4FNBLx2Pqcsm2uLVNL6-yY9JxN","r":"https://51vi4vae20f8o.h5games.usercontent.goog/v/66bqinuuh36b8"},{"id":"UgkxkuadeVb9hZneZfe3ztf1qn6Y-rL6Aqij","t":"Bolly Beat","d":"Dance to the beat in this Bollywood music themed rhythm runner game.","g":"Music","p":"GameSnacks","dt":"Sep 10, 2024","i":"https://bollybeat.h5games.usercontent.goog/v/2sql96sos3cjg/images/vertical1920.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxkuadeVb9hZneZfe3ztf1qn6Y-rL6Aqij","r":"https://bollybeat.h5games.usercontent.goog/v/2sql96sos3cjg"},{"id":"UgkxNJ1SJnFCVoE_CE7Iv8kAyra-6TVcT33N","t":"Bottle Jump 3D","d":"In Bottle Jump 3D, your goal is to finish all levels safe and sound by doing a home flip.","g":"Action","p":"Azur Games","dt":"Jul 30, 2024","i":"https://yt3.ggpht.com/AoD0yWLTEsXmgKhj6mC6zNbXpR6d2ESrm83JLNlpbwyssiJUl9LxSAetYZ75jGN2LC9MkF0mOsHo_A=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxNJ1SJnFCVoE_CE7Iv8kAyra-6TVcT33N","r":""},{"id":"UgkxvbtEWcHGpsA0ROaS7QLgh9rlcLw9aKQF","t":"Bowmasters","d":"Bowmasters is an action game. Players have to use the right angle and amount of force to hit their enemy from a distance.","g":"Action","p":"Azur Games","dt":"Feb 11, 2025","i":"https://yt3.ggpht.com/6kDQo2EzyKgnSW6bwh1nj1-Ia1cgYWi88VtLD2S1JNWemVXoh_LlE1q7uvI6_NBHsCB4qBso_S93gg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxvbtEWcHGpsA0ROaS7QLgh9rlcLw9aKQF","r":""},{"id":"UgkxSxr2TP347bOmLco8gaPvBUwilDvO47Ys","t":"Brain Out","d":"Brain Out is a popular, globally acclaimed game, combining IQ challenges and reverse thinking in engaging puzzles.","g":"Brain & Puzzle","p":"EYEWIND LIMITED","dt":"Aug 16, 2023","i":"https://yt3.ggpht.com/435KaLnf2_7Ijp5rYs_LHSzIfhUnOMxyp90OCDAQJDN-rlxgua5C9hMT6CL81sFh7o9nKumE4yYBqg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxSxr2TP347bOmLco8gaPvBUwilDvO47Ys","r":""},{"id":"UgkxytGBPWPaTj-4F9cRGT8X1JB-j_mbFsN4","t":"Bridge Race","d":"stack your bricks and create a bridge - compete against other characters in order to win the race","g":"Racing","p":"Supersonic Studios","dt":"Sep 17, 2024","i":"https://yt3.ggpht.com/rJIfO09bIcALknkR_oAdUD9dsEePBfXPL5hLtduE9B_WIl9oFj27PZFh2KaKxG7twdZhY6PmxHhqYw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxytGBPWPaTj-4F9cRGT8X1JB-j_mbFsN4","r":""},{"id":"UgkxJDh35a5buq4ZFSiTAk4_NlVrolGJdzmS","t":"Bubble Pop Star","d":"The perfect bubble shooter game to relax and challenge! Kick back, have fun and pop bubbles to rack up stars in this chill yet challenging game.","g":"Brain & Puzzle","p":"IVYMOBILE INTERNATIONAL ENTERPRISE LIMITED","dt":"Mar 26, 2024","i":"https://yt3.ggpht.com/wKQ0THmEOKjb3dPowXUs1dm1zi-RiouEBgfxg_xphiQO7zrOI6oEZTdEQTDUxdl_kBTkBt8Xxe8HVg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxJDh35a5buq4ZFSiTAk4_NlVrolGJdzmS","r":""},{"id":"Ugkx0KxW3hcMo5oN54VXTwcXrH8-ie8mXEVQ","t":"Bubble Shooter","d":"Match bubbles to pop them in this bright, colorful game.","g":"Arcade","p":"Arkadium","dt":"Oct 1, 2024","i":"https://yt3.ggpht.com/fXBFFhCaUwPicNxxzqhWtim4BwM60PQhbA92heRSwJm3zCuGHxlsB-3ukBU74yX8TJZnlyKtuyMKLw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx0KxW3hcMo5oN54VXTwcXrH8-ie8mXEVQ","r":""},{"id":"UgkxfDDQMWeDSuzNF8eyFzBfKbCcf8U-LNCS","t":"Bubble Tower 3D","d":"Experience this reinvented videogames classic in a completely new dimension and an amazing aztec setting!","g":"Action","p":"Famobi","dt":"Jan 14, 2025","i":"https://yt3.ggpht.com/uZYFkMrtnhmh66ZmYy47sOfHmYxfn7mR7GFS_1CcPL4j2LV8ntxodww4M3z_9se2SUGFZqQYhFdjLg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxfDDQMWeDSuzNF8eyFzBfKbCcf8U-LNCS","r":""},{"id":"UgkxyKs3Ve_RG1PMcTKDbdNtSTCmpKj2kDKj","t":"Build a Queen","d":"Make the right choices to Build the Most Beautiful Queen.","g":"Racing","p":"SuperSonic Studios","dt":"May 20, 2025","i":"https://yt3.ggpht.com/OfTseznURy1hwVsFyfrWZmJgwB8DPF1RhYZH7d6tVImaIzW_Tdkm9Mf977ksvdmgTdgtrvD6NCpGEA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxyKs3Ve_RG1PMcTKDbdNtSTCmpKj2kDKj","r":""},{"id":"UgkxLw3iH-BTCWSOxlDhNgrRswAkXcZIa8pb","t":"Cake Sort: Color Puzzle Game","d":"Cake Sort - Color Puzzle is a relaxing game where you sort and merge cake slices to create delicious desserts.","g":"Brain & Puzzle","p":"Cone Limited","dt":"May 13, 2025","i":"https://yt3.ggpht.com/H60fD8ERpQH76B8pgAi6tG-Q4Jf9Y0xL_EOTxRcpiQsjigq_Z-jBF62VNyyQFfqJfJzSM3vN8toqag=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxLw3iH-BTCWSOxlDhNgrRswAkXcZIa8pb","r":""},{"id":"UgkxtJBl0ZoeInS-4l5yzLRPqToF7zHv4dhr","t":"Cannon Balls 3D","d":"Try to be the master of destruction, heat up the buildings neatly and show no mercy!","g":"Arcade","p":"Famobi","dt":"Aug 18, 2023","i":"https://yt3.ggpht.com/8EqAG1-xaYWgPynx7gy2tQLwmLpYSXx5af8xDLIHyCwr1QOq3gh7MXuFqMj_Lecu3VZXNLN2gXDjpQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxtJBl0ZoeInS-4l5yzLRPqToF7zHv4dhr","r":""},{"id":"UgkxDkt7KoEwDEyNjnIyq-8oz8_DLlriStjB","t":"Cards of the Undead","d":"","g":"RPG & Strategy","p":"GameSnacks","dt":"Jan 30, 2024","i":"https://4afojpng981kg.h5games.usercontent.goog/v/1ge6qnd6h4ss0/images/cotu-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxDkt7KoEwDEyNjnIyq-8oz8_DLlriStjB","r":"https://4afojpng981kg.h5games.usercontent.goog/v/1ge6qnd6h4ss0"},{"id":"UgkxluYt1LEffJ0QagvP4KyKyrMeizA3XVe-","t":"Carrom Clash","d":"Compete in this classic Carrom board game","g":"Sports","p":"GameSnacks","dt":"Jun 7, 2023","i":"https://carromclash.h5games.usercontent.goog/v/2c8af22a-0d67-4b42-a42c-09eca14632c4/high_res_tall.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxluYt1LEffJ0QagvP4KyKyrMeizA3XVe-","r":"https://carromclash.h5games.usercontent.goog/v/2c8af22a-0d67-4b42-a42c-09eca14632c4"},{"id":"UgkxggiwgxQIFcmuCia130ZlskxLsXd8mTA3","t":"Chess Classic","d":"Exercise your brain and immerse yourself in one of the world's most popular board games!","g":"Board & Card","p":"Famobi","dt":"Dec 11, 2023","i":"https://yt3.ggpht.com/AynS1UlQGN4rbJy2Vzmp3WrgYQXsqzeB7jn3Oq0AOCPvGhsckZ6al3zFEv95vImtEPAUF2xdMwqCjjQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxggiwgxQIFcmuCia130ZlskxLsXd8mTA3","r":""},{"id":"UgkxhpR_EFQxif6EFOQZKOss5-BadJj6TIvQ","t":"Classic Mine Sweeper","d":"Test your wits in this classic minesweeping adventure! Can you clear the field and claim victory?","g":"Brain & Puzzle","p":"Ravalmatic","dt":"Mar 4, 2025","i":"https://yt3.ggpht.com/XHdVZOgHG7MbwFoTBwt-M4UK2dTHby_BXRitXgnMLlD7pRVCmAueoD0lIbeipA58BRQ8DyWXdfZaVbE=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxhpR_EFQxif6EFOQZKOss5-BadJj6TIvQ","r":""},{"id":"UgkxsqrPhe4p8MCzJrgzC4SMrdU-WvUP9QV8","t":"Collect Em All!","d":"Connect the balls of the same color to crush them! Make the longest chains and break them to get the rocket boosters!","g":"Brain & Puzzle","p":"Voodoo","dt":"Nov 28, 2023","i":"https://yt3.ggpht.com/R3zm9nd9jQlqKxKNW_QWiUz81HtCncC3ZT7pctR6t6N9sok7l6wtcCWM5UxFBS4r7QJWccleYUlyJw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxsqrPhe4p8MCzJrgzC4SMrdU-WvUP9QV8","r":""},{"id":"UgkxcobZM_stIxOBW-bQwKcrUiYbg11g4x55","t":"Color Burst 3D","d":"Smash a colored ball into matching colored sections of rings in this increasingly difficult action game.","g":"Arcade","p":"GameSnacks","dt":"Jun 7, 2023","i":"https://colorburst3d.h5games.usercontent.goog/v/f9ac46fc-3e68-4395-ab17-fe9b056df979/high_res_tall.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxcobZM_stIxOBW-bQwKcrUiYbg11g4x55","r":"https://colorburst3d.h5games.usercontent.goog/v/f9ac46fc-3e68-4395-ab17-fe9b056df979"},{"id":"UgkxK2uVzxmj4-7yUnbU8mSs0hX9XwdGZ_Pd","t":"Color Match","d":"Blend colors and paint 3D objects, transforming them into vibrant masterpieces.","g":"Brain & Puzzle","p":"Supersonic Studios","dt":"Jan 30, 2024","i":"https://yt3.ggpht.com/W5OY8W6Hx3qFZnV1OmAIe28Pl2UhOmZtsPP0olAFRbNkbYDjiHrs6sMBeeCock2qA7fLHFgDAaYD=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxK2uVzxmj4-7yUnbU8mSs0hX9XwdGZ_Pd","r":""},{"id":"UgkxnOvRlIZp-uwV0MhCvN54gukpFctesXu9","t":"Color Page ASMR","d":"Draw the image and color in the spaces to create the complete picture.","g":"Simulation","p":"SayGames","dt":"Jan 9, 2024","i":"https://yt3.ggpht.com/f85oZm24n5o8Sek4KCzz53TKUrJOZ6WxFBcb9nqEkjlk9Pzgg2zu67NoSnBJodnuYuK6iEM6FEo9Rg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxnOvRlIZp-uwV0MhCvN54gukpFctesXu9","r":""},{"id":"UgkxRscQl2OyLGa13m5LKa20ZKyA9nSDIPNM","t":"Color Pixel Art","d":"Select your favorite category and have fun creating beautiful pixel artwork. Relax and enjoy!","g":"Brain & Puzzle","p":"Famobi","dt":"Oct 9, 2023","i":"https://yt3.ggpht.com/1o7Reoak9sVhQTGT3TA0YZTLroA6xoJG06VpsCxba0UY67yoWKlI7zK_RqDXwfqI9N2CzP4L8mN5lw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxRscQl2OyLGa13m5LKa20ZKyA9nSDIPNM","r":""},{"id":"Ugkxt5LdUBSZPWDLNRcH-IDpCRYXlBSRbTdh","t":"Color Water Sort 3D","d":"Time to know how smart you are! Test your brain, Solve the water sort puzzle games.","g":"Brain & Puzzle","p":"Famobi","dt":"Nov 19, 2024","i":"https://yt3.ggpht.com/RmbA0IUo70awr8Sh4Eit_IrymumooSPJIIJK80d1xAUANtax2W922LfGJtEkQwa83_i16VZTg88l=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxt5LdUBSZPWDLNRcH-IDpCRYXlBSRbTdh","r":""},{"id":"Ugkx38SY9leoakWiUx7rv-qYszsxL0-u-Qh8","t":"Coloruid","d":"Dive into a vibrant world! Your goal is to transform the entire field into one color. Stay focused, choose wisely, and claim your victory!","g":"Brain & Puzzle","p":"Logic.Cool OU","dt":"Apr 15, 2025","i":"https://yt3.ggpht.com/672n20W7YfFDv7ohD78ujRlPnCtQo-dn8D4at2raTUSMcYJbzUdfQUca3atVBPFMCpi_aYZNN53V=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx38SY9leoakWiUx7rv-qYszsxL0-u-Qh8","r":""},{"id":"UgkxwNjlSyEDGtKpOQAjA94Ck4LHXmF0qKCb","t":"Crazy Caves","d":"Dig into crazy depths with new action-loaded mining game. Grab your pickaxe and mine yourself to the highscore!","g":"Arcade","p":"Famobi","dt":"Aug 16, 2023","i":"https://yt3.ggpht.com/5EfQbu7HKZZXwcUtbLKnwXFuYUY6OIwvr_lPmGWx_KEptECGddZta0XQIZohuRhpUOWA2ezvJaDf=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxwNjlSyEDGtKpOQAjA94Ck4LHXmF0qKCb","r":""},{"id":"UgkxTgpC4XvYRVY_5jlf_h0yiq8Ayvjyikt2","t":"Cricket Hero","d":"All eyes are on you! Lead your cricket team to glory by smashing perfect shots—just watch out for chicken eggs and bombs!","g":"Sports","p":"Ravalmatic","dt":"Apr 1, 2025","i":"https://yt3.ggpht.com/K-m6_Olarsny18UsTx9HYC2jN64LPcYZR8sh-5FGyX5ZQVzlvbLA4Ev2t8tLDjJjDjP0xjVN4MKANnM=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxTgpC4XvYRVY_5jlf_h0yiq8Ayvjyikt2","r":""},{"id":"Ugkxy0lb6paveolUcuucnKbsUDYGm1ZK7plA","t":"Crossy Road","d":"Crossy Road is the 8-bit endless arcade hopper that started it all. Collect custom characters and navigate freeways, railroads, rivers and much more.","g":"Arcade","p":"Hipster Whale","dt":"Feb 25, 2025","i":"https://yt3.ggpht.com/mkKGoijLUlU9vTw5htm-aXEkdwRGEc9FMZ7yxY9xkim_FtzciVSOHmheYoLFQgkJZptjOJIWIZtV=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxy0lb6paveolUcuucnKbsUDYGm1ZK7plA","r":""},{"id":"Ugkx2frULoOS6xBh8D0dZY6G9vvn5ODEzXpw","t":"Cube Tower","d":"Defend your base from hordes of alien invaders with your strategic skills and arsenal of upgradable weapon towers.","g":"RPG & Strategy","p":"GameSnacks","dt":"Sep 27, 2023","i":"https://cubetower.h5games.usercontent.goog/v/6r00q48lnddq0/MarketingAssets/Cube_Tower_Thumb_Tall_1080x1920.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx2frULoOS6xBh8D0dZY6G9vvn5ODEzXpw","r":"https://cubetower.h5games.usercontent.goog/v/6r00q48lnddq0"},{"id":"Ugkx2d5qQg5_Snq2mIm4BC1tyrHkdS_2daYs","t":"Cut The Rope","d":"Cut the Rope, catch a start and feed Om Nom candy in the award-winning game!","g":"Brain & Puzzle","p":"Famobi","dt":"Dec 19, 2023","i":"https://yt3.ggpht.com/M606FXPaUfeAgEBurYjNXWt_khP8QAstRu1XUdkS6S4pTeJcJLhHLdUm7N1dGOW_k5uxLzmhILvM=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx2d5qQg5_Snq2mIm4BC1tyrHkdS_2daYs","r":""},{"id":"UgkxzLdK8NRUhAAcDeM7XKw-q9ePMo_tJ-Hp","t":"Daily Crossword","d":"The best free online crossword is brand new, every day. No pencil or eraser required!","g":"Brain & Puzzle","p":"Arkadium","dt":"Jul 25, 2023","i":"https://yt3.ggpht.com/samPCPuTAXH7H0SUXnxKV9DZv4P9IlVr0g5KUhHzRJ9qGrqBT0vmtcGNX7dLy54SbQM3cFK0UNfHCA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxzLdK8NRUhAAcDeM7XKw-q9ePMo_tJ-Hp","r":""},{"id":"Ugkx535wU-TyMgXfQJ25KsJZOtWDR9KcVeCh","t":"Daily Solitaire","d":"Daily games of Solitaire, come back each day for a new challenge!","g":"Board & Card","p":"GameSnacks","dt":"Aug 13, 2024","i":"https://dailysolitaire.h5games.usercontent.goog/v/0e4orvvorj2mo/images/daily-solitaire-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx535wU-TyMgXfQJ25KsJZOtWDR9KcVeCh","r":"https://dailysolitaire.h5games.usercontent.goog/v/0e4orvvorj2mo"},{"id":"Ugkxb0tntcsC8v4im93WkkwRej9-_lE-TDx-","t":"Daily Solitaire","d":"Daily Solitaire is the classic klondike solitaire game that features different challenges each day!","g":"Board & Card","p":"Arkadium","dt":"Jul 28, 2023","i":"https://yt3.ggpht.com/_FcD7DcXP3nzgBrLyoaU5nFTea0_ye6LJ9VHIXsO1x0Fjqli1Be00gtqlNGK6aODvfP5BmFDZpn9Xt4=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxb0tntcsC8v4im93WkkwRej9-_lE-TDx-","r":""},{"id":"UgkxW0zdrtok4czk5IE1sj4MTiaFk45aHfwF","t":"Decor Life - Home Design Game","d":"Decor Life is a game that lets you live out your interior design ideas, trying out different furniture and decor concepts in any way you want","g":"Simulation","p":"SayGames LTD","dt":"Jul 25, 2024","i":"https://yt3.ggpht.com/hSlRZipGTwf4eP3b8aner_LkM35TLGAUdnbt1SrW0Y5Sxr_tvMZoTfnBS_JcWfqVv7NlC22gqF_z=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxW0zdrtok4czk5IE1sj4MTiaFk45aHfwF","r":""},{"id":"Ugkx5iFcTcmiJFaj-5nMnXmpDh0cqrH3lTxi","t":"Dessert DIY","d":"\"From lollipop-inspired cake designs to mastering the art of the ice cream roll, your journey as a cooking master and cake maker is filled with endles","g":"Simulation","p":"CrazyLabs LTD","dt":"Jun 25, 2024","i":"https://yt3.ggpht.com/hIG2Z8t8E2oTcQ3KgaPciqR3Jv72jJcbx3V6GwD6D6YoSs0w8S9xeQgXfr_36i7-gZvZnSrBcojQg04=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx5iFcTcmiJFaj-5nMnXmpDh0cqrH3lTxi","r":""},{"id":"Ugkx6yIZ8d_l2uFN_wlC3sKxCbdpDtkVMG2-","t":"Dig Deep","d":"Ready to be a mining diamond tycoon?! It’s time to become a gold digger and shovel your way to success.","g":"Action","p":"CrazyLabs","dt":"May 7, 2024","i":"https://yt3.ggpht.com/yadqJl8HQVQSMKCOvI2fcjhE_MHC7Bf38VejISSGHxcJDokeydqak-IRHwZNs_oC-0f-CF89y6DgMA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx6yIZ8d_l2uFN_wlC3sKxCbdpDtkVMG2-","r":""},{"id":"UgkxlufHVt8aPZZBGb7fCMVnfJsbuZpAdjZQ","t":"DOP 2: Delete One Part","d":"Delete One Part has created a whole new genre of puzzle games where players complete an image by deleting a part of it.","g":"Brain & Puzzle","p":"SayGames LTD","dt":"May 21, 2024","i":"https://yt3.ggpht.com/4FoJkHlkTbISh4agShFFuy4kIyP7H027RcdMKUmLtDa-rRN7RHuImeaS8pnJ7y3RotBtolm5Vf2ru50=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxlufHVt8aPZZBGb7fCMVnfJsbuZpAdjZQ","r":""},{"id":"UgkxymTaeEEmPY8v-X36S3PtqbEy8v-m5f1f","t":"DOP 4","d":"Draw the shapes of the parts that the drawings need and solve the puzzle!","g":"Brain & Puzzle","p":"SayGames","dt":"Jan 30, 2024","i":"https://yt3.ggpht.com/tOJTN8z18OkQjRrHI5sKmlx09G9YfAYyBgHFVZPAS3GeaqYIN8AfbR9Kocer8UmPKliM3f7ZW3mxTw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxymTaeEEmPY8v-X36S3PtqbEy8v-m5f1f","r":""},{"id":"UgkxYXA6kHXmgzTxbWijhtAfQUSRsipYkuKm","t":"Draw Climber","d":"Funniest race you have ever played! Draw your legs to win the race!","g":"Racing","p":"Voodoo","dt":"Nov 28, 2023","i":"https://yt3.ggpht.com/QdXAkY-VrhUghJeagY6YQbQPSvd_Bp07KVda-eI1a0d5ruAwGdIOl1pzHx5txIYAtS9WNzQnnHImLQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxYXA6kHXmgzTxbWijhtAfQUSRsipYkuKm","r":""},{"id":"UgkxnstpF8MxByAqBl2sHWRVx0DkueiGebIL","t":"Draw The Line","d":"For the ball to reach the destination, have the proper level of ingenuity and quick reaction, otherwise you will have a hard time.","g":"Arcade","p":"Supersonic Studios","dt":"Sep 10, 2024","i":"https://yt3.ggpht.com/7MTorGhXUnBHm_SP9MO0SAIwiLfboiRO37zg92nGAEl2LNCET_vFe0X_5_GV33exYGlzFsaq8o0T=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxnstpF8MxByAqBl2sHWRVx0DkueiGebIL","r":""},{"id":"UgkxtQ_026sV0QUSYE0IJfl9Iov1Ol5mkPo_","t":"Drawing Carnival","d":"A cool coloring game, you draw sketch! Unlock your inner artist and create a picture made up of different styles in a puzzle","g":"Simulation","p":"CrazyLabs","dt":"Aug 6, 2024","i":"https://yt3.ggpht.com/MOMoh-ewhQfFKMTOMgefFlRzDDfyMYC8uSY_TQFkFQM5N36eJKoIHr3ytMgQ-JuR0SuZKPnPr90NiO0=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxtQ_026sV0QUSYE0IJfl9Iov1Ol5mkPo_","r":""},{"id":"UgkxWwmO5vYaH02IwIlnLC1VDU6R09_v7yLX","t":"Element Blocks","d":"Weather the elements in this crazy addictive puzzle game!","g":"Brain & Puzzle","p":"Famobi","dt":"Aug 15, 2023","i":"https://yt3.ggpht.com/yuEdROWDQVAUo2JD7-a2LhGpuKOgM6WB3Od8fCefh6qL1sQW7-eXG2eU8FEXECryI68w5zHDDAQRJuM=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxWwmO5vYaH02IwIlnLC1VDU6R09_v7yLX","r":""},{"id":"Ugkx0VoVYc2DncpX5jR5KaUKr_W9rsz8VidL","t":"Emoji Puzzle","d":"A new imagination game in which you need to connect pairs of emotions by associations. Think and find the idea of each puzzle.","g":"Brain & Puzzle","p":"Supersonic Studios","dt":"Mar 12, 2024","i":"https://yt3.ggpht.com/mCkCN4gCj8GJuBJKnlOiVJgq5wKfmZyJNJRiDwFT-HNWo0zesWhfVBacpZX8TklPJEepnn3q3rUYig=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx0VoVYc2DncpX5jR5KaUKr_W9rsz8VidL","r":""},{"id":"UgkxWp38CScpoU0eFEvImoVEgu5alAcIiogA","t":"Endless Siege","d":"Endless tower defense with daily maps","g":"RPG & Strategy","p":"Ravalmatic Studio","dt":"Mar 5, 2024","i":"https://yt3.ggpht.com/-2HZvKUNJaulN-Gd_H6o7AJ0KgM-E6pZu-H2R_Sxu6Q_BcebYjpBJvN-8VlkJR5v6ktpyz1spd2SVP4=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxWp38CScpoU0eFEvImoVEgu5alAcIiogA","r":""},{"id":"Ugkx7e4-_ftnMcfjKtTm1qsl-fjNNa0dwSr7","t":"Fairyland Merge","d":"Combine magical items, solve puzzles, and restore the enchanted realm. Adventure awaits in this whimsical game. Time to merge magic on a fairy island!","g":"Simulation","p":"VANUPLAY INNOVATIONS INC.","dt":"Sep 24, 2024","i":"https://yt3.ggpht.com/BX_4HkxKKx6zGUz91dTapoCKp1YSDQnU5ewqWlcVls33OKXMspRIpscHUrIEuk3cWTgCEyzPWLrP=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx7e4-_ftnMcfjKtTm1qsl-fjNNa0dwSr7","r":""},{"id":"UgkxuIJWZNF2yjYZBROSWi56ThCfkPWhf1BU","t":"Family Life","d":"Experience various life events and make your choices,experience the life experiences of family members,invest in business,establish your own family","g":"Simulation","p":"Supersonic Studios","dt":"Jan 21, 2025","i":"https://yt3.ggpht.com/pfjqfBJI2jgu5CNmvR2Eej_MFL2XEJbsMWykPCkN9Sfjcwd6qQ7_lomcCFRBVBt1eRLglCzCj5Wadg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxuIJWZNF2yjYZBROSWi56ThCfkPWhf1BU","r":""},{"id":"Ugkxsk_eNi3xerLPa1SuoUIftBIWxzlTCbAN","t":"Farm Land","d":"Explore the world to find new produces and increase your farming empire! It's time for you to go green!","g":"Simulation","p":"Homa","dt":"Sep 27, 2023","i":"https://yt3.ggpht.com/-jo3IAizqBMQ07o8OJKohQmhFSm10Q3JxnmYhk4rHtRm1_owHR_rF24KacroWqzQ5PNqL-D7OaIE=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxsk_eNi3xerLPa1SuoUIftBIWxzlTCbAN","r":""},{"id":"UgkxBmXJ3VmnS1JrSRApV-p7oOCh4DNo-nr9","t":"Fashion Battle","d":"Get ready to dive into the ultimate dress-up experience and show your creativity!","g":"Brain & Puzzle","p":"Famobi","dt":"Sep 24, 2024","i":"https://yt3.ggpht.com/OjkS3PcYfTpHgevwbKKSpRCxh-Ey7xxb9ttJmLKfVYfbIZNOvtz5k7LWcI2BclzyYEpvQUSDTJSRAQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxBmXJ3VmnS1JrSRApV-p7oOCh4DNo-nr9","r":""},{"id":"UgkxuDSpS3gp4pwkMxIxjbrQRs5gw9ZQE7ma","t":"Find Out","d":"Seek hidden objects, solve puzzles, and challenge your skills. We offer multiple game modes for your entertainment. Time to relax and enjoy!","g":"Brain & Puzzle","p":"EYEWIND LIMITED","dt":"Jan 9, 2024","i":"https://yt3.ggpht.com/kkRpw8i0fjP3CI_VyVcuOiLP5tST1VhUL_d5BzXUdIzXjzwDaQETKioQj_L9MvYC3UFiW5o-l_9ewg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxuDSpS3gp4pwkMxIxjbrQRs5gw9ZQE7ma","r":""},{"id":"UgkxX6Rxp43A1J4Lsd-8w9nQnYsj7ZcupfRe","t":"Find the Alien","d":"Find the impostor hiding among us in this amazing action game","g":"Action","p":"Moonee Publishing LTD","dt":"Apr 2, 2024","i":"https://yt3.ggpht.com/tih00EFZT7fHCbjCn7seuwqakgYdLfHSxWPLZ9IOrzfhZ8RN2xHOJA61BuQrLKt8HNE3l3h9q1gtAA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxX6Rxp43A1J4Lsd-8w9nQnYsj7ZcupfRe","r":""},{"id":"Ugkxx-BYHg4_MLyHtp7khA8gbJ6HfoSNc0uh","t":"Flames & Fortune","d":"Delve deep into eerie dungeons where every run is a new challenge and every decision counts.","g":"Board & Card","p":"Ravalmatic","dt":"Jan 7, 2025","i":"https://yt3.ggpht.com/LXR8IsayjC4hZ1QQ7M24zljmg94vCVG1TyuE-sHugrE30p9dy8oK4Rb9Glt7ANh-fxAUb8GifUBShpw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxx-BYHg4_MLyHtp7khA8gbJ6HfoSNc0uh","r":""},{"id":"UgkxXpLALBdUxSC7jCKF4z9yedUBoGOiP--m","t":"Flappy Dunk","d":"Tap and bounce for the highest possible score! Tap to jump through as many hoops as possible.","g":"Arcade","p":"VOODOO","dt":"Oct 1, 2024","i":"https://yt3.ggpht.com/Hj2johEY4_2RkZBQXzp3FbMk359EghlXpLipZzpbOu3kkyTSuHHSHhqRKh8V7p0K5qThaLFGFW7vvw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxXpLALBdUxSC7jCKF4z9yedUBoGOiP--m","r":""},{"id":"UgkxGtkDuznWvn6QagqbKGU-mmrVbxc0I5jw","t":"Flappy FootChinko","d":"Master the ball in this zany soccer game and claim top trophies. Precision is key—are you ready for the challenge?","g":"Sports","p":"Ravalmatic","dt":"Feb 4, 2025","i":"https://yt3.ggpht.com/RfLB9BxEhGQ9ywE12S0LmGHm-rIvnLnkup8e7p09WNIgogShKf1Cf1t2NoPDqzK42WDeCpnpA9Ycew=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxGtkDuznWvn6QagqbKGU-mmrVbxc0I5jw","r":""},{"id":"UgkxENp8UiOiH6UhnUWC7p0Nz6SuKDbkIu35","t":"Flow Legends","d":"Can you connect pipes into a pipeline? Rotate pipes, make a path & solve puzzle!","g":"Brain & Puzzle","p":"AZUR INTERACTIVE GAMES LIMITED","dt":"May 14, 2024","i":"https://yt3.ggpht.com/VvYC0W1RLe7ZsgNNlUKt6wVUiDLe_s5fiIaJrMtuWKtrYJwAwvsnnTWT2bJcPOJS3dJ9iUHAO6YG=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxENp8UiOiH6UhnUWC7p0Nz6SuKDbkIu35","r":""},{"id":"UgkxHBikoPw1z8txNU8EUp-u1eDBmvO-3WBH","t":"FootChinko","d":"The craziest soccer game ever! Lead your team to victory in thrilling competitions full of unpredictable fun.","g":"Sports","p":"Ravalmatic","dt":"Mar 25, 2025","i":"https://yt3.ggpht.com/ySZMPg4RDuxS59OcCFd8UGg-UmmRJPqql-TDuDWv2XumWGPEXD1HrZ5EDxQutMvTZbqNLdX1riwfIA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxHBikoPw1z8txNU8EUp-u1eDBmvO-3WBH","r":""},{"id":"UgkxJ8HhUksjxAC3No1GfRoBLFLYc8SsLLVv","t":"Fork N Sausage","d":"Better get that sausage on your fork! Every few levels new kitchenware will help your sausage bounce and flip its way to the fork.","g":"Arcade","p":"SayGames LTD","dt":"May 28, 2024","i":"https://yt3.ggpht.com/QE7R_HfS1wLAXrIK8I6cJYX1u9WOiUA9FjHJVBzoAoRB7u8cOj6CzvG9sQMVc4R9xX2wX1gBJ4WQN50=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxJ8HhUksjxAC3No1GfRoBLFLYc8SsLLVv","r":""},{"id":"Ugkxbnpb-Zfu90iTv-d_1rZA5kUiiZwUz5U3","t":"FreeCell Solitaire","d":"In the mood to actually win a game of solitaire? Try Freecell Solitaire, where every game is solvable.","g":"Board & Card","p":"Arkadium","dt":"Aug 1, 2023","i":"https://yt3.ggpht.com/RVOqxqW7uzVFR3_yxvK4pmmtsKnEZw3Ym009ROG2-udg79w1VeqCP-xM1ckkA9hCraj_W3fRK3m03g=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxbnpb-Zfu90iTv-d_1rZA5kUiiZwUz5U3","r":""},{"id":"UgkxjX3-84ZFPZHSm99ZIsn9eqPQQSoWJPxS","t":"Freekick Football","d":"In Freekick Soccer, you'll put your penalty-taking skills to the test against some of the world's best goalkeepers. With stunning 3D graphics, real…","g":"Sports","p":"GameSnacks","dt":"Apr 16, 2024","i":"https://freekickfootball.h5games.usercontent.goog/v/0lqeu7698mvk0/images/vertical1920.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxjX3-84ZFPZHSm99ZIsn9eqPQQSoWJPxS","r":"https://freekickfootball.h5games.usercontent.goog/v/0lqeu7698mvk0"},{"id":"UgkxXYGAYFMFRZ_xXj3U5_nFFkUB6U6Gdgpl","t":"Fruit Ninja","d":"Play the original multi award winning samurai fruit slasher that kicked off a new genre of gaming! Master it while watching out for those pesky bombs.","g":"Arcade","p":"Perpetuum Media","dt":"Dec 17, 2024","i":"https://yt3.ggpht.com/G1TIKRdMhH_lj8-WAfZbc17aWYAYNeVgm5PC7O7LrHIcgJHyqgsz-BjwVyFv1mHLcO1deL85zmS0Kjk=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxXYGAYFMFRZ_xXj3U5_nFFkUB6U6Gdgpl","r":""},{"id":"UgkxCVbezWvZC9_zahVHoqGY5mmnLxHPVV7O","t":"Gin Rummy","d":"The classic two-player card game! Can you defeat all 5 opponents?","g":"Board & Card","p":"GameSnacks","dt":"Aug 4, 2023","i":"https://ginrummy.h5games.usercontent.goog/v/1sj72j2nsfin0/images/ginrummy-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxCVbezWvZC9_zahVHoqGY5mmnLxHPVV7O","r":"https://ginrummy.h5games.usercontent.goog/v/1sj72j2nsfin0"},{"id":"UgkxHA3g0fIzP5fuRtL23jUt8XgVhwZlPmik","t":"Go Escape!","d":"Go Escape is a wickedly addictive mobile game that amps up the classic ball game vibe with a killer twist.","g":"Arcade","p":"Azur Games","dt":"May 20, 2025","i":"https://yt3.ggpht.com/4_VOEoR12k7Q__xHE9fI2qCOIrssVbNLIKE_xpNCnDPyB2n081PKbLBavryEe04p-qbt1R9aYUjK4h0=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxHA3g0fIzP5fuRtL23jUt8XgVhwZlPmik","r":""},{"id":"Ugkxq_6XlcO-sE5jjnkzjoSLjy3oJ3y85-zP","t":"Goods Puzzle: Sort Challenge","d":"Goods Puzzle: Sort Challenge is a fun match-3 game! Swap goods, use power-ups, and beat obstacles in exciting levels and special events.","g":"Brain & Puzzle","p":"Cone Limited","dt":"Apr 22, 2025","i":"https://yt3.ggpht.com/BGT2hiWxNRUsnM98W4a8jfFgwgg3p8eEH-6c6SXay4eI-RHQepSxlVJwLj43x__sLhpqzbBzg9LqMNE=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxq_6XlcO-sE5jjnkzjoSLjy3oJ3y85-zP","r":""},{"id":"UgkxALPyLFG5NFuZND9ChTdbB76gL97g_ILt","t":"Guess Their Answer","d":"Test your iq level & crack trivia in quiz games!","g":"Brain & Puzzle","p":"Famobi","dt":"Aug 6, 2024","i":"https://yt3.ggpht.com/M9OX4Ps5Snz0LEcajUilyqbAubVG9BE0jEzVgNrTs79ee-cyTOoIT6mxgN4qlrMji9m6TZwZgtOLdw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxALPyLFG5NFuZND9ChTdbB76gL97g_ILt","r":""},{"id":"Ugkxz_XgefyvEGG_X70WJUGuOcdCZyhAmvmQ","t":"Gym Stack","d":"Work out your mental muscles in this 3D puzzle match game.","g":"Brain & Puzzle","p":"GameSnacks","dt":"Dec 17, 2024","i":"https://gymstack.h5games.usercontent.goog/v/3js1l1d7rdkfg/images/hd_res_tall.jpeg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxz_XgefyvEGG_X70WJUGuOcdCZyhAmvmQ","r":"https://gymstack.h5games.usercontent.goog/v/3js1l1d7rdkfg"},{"id":"UgkxnEOEdyjMRwzuaOCNlMYD8q8dS0jubTXv","t":"Harvest.io","d":"A new farming simulator in io style. You can drive the tractor all over the field to harvest crops! Don't bump into yourself or others.","g":"Simulation","p":"Azur Games","dt":"Nov 26, 2024","i":"https://yt3.ggpht.com/YxRLX-yXceCmw-WEXizrnEQ5Kq4y7S5BIeKaQyHQ7SPGQ83UJpO_CEQBwzkEpbIf8IlakJ0Idb13Zw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxnEOEdyjMRwzuaOCNlMYD8q8dS0jubTXv","r":""},{"id":"Ugkx5MRlPuIgVY8roiYI_LmuR7juykVtmFvn","t":"Helix Jump","d":"Go to the bottom ! The thrilling adventure of a bouncing ball through a spiral maze tower.","g":"Arcade","p":"VOODOO","dt":"Jun 11, 2024","i":"https://yt3.ggpht.com/zqi3A1biCqk5mrV0TbMjkS3jzZpfCBdABUs_U5GsS2jle02SiEO_UlFCVpgh7aMfw7WAKJpv4pNHiQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx5MRlPuIgVY8roiYI_LmuR7juykVtmFvn","r":""},{"id":"UgkxhXOvOZQjU5tKA5iTpSGbqHv5eHQWB15y","t":"Hexa Dungeon","d":"Battle enemies to survive the dungeon in this exciting puzzle adventure.","g":"Arcade","p":"GameSnacks","dt":"Apr 8, 2025","i":"https://hexadungeon.h5games.usercontent.goog/v/2b9ankkos3408/images/hexadungeon-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxhXOvOZQjU5tKA5iTpSGbqHv5eHQWB15y","r":"https://hexadungeon.h5games.usercontent.goog/v/2b9ankkos3408"},{"id":"UgkxgpLJNCNUkCXRVD5HrDZfOHqxtJAX5zET","t":"Hide N Seek","d":"Play either as a seeker or as a hider and build your shelters. Also try to push others in the seeker's vision field.","g":"Action","p":"Supersonic Studios","dt":"Apr 30, 2024","i":"https://yt3.ggpht.com/4Pt7_eUgB54bgvfWJnMAQdODTMGp2aeqWNEb9efW1dBMcZs6pPHw7ogfcYPBJToSwf_Ul1lDQ0VdsA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxgpLJNCNUkCXRVD5HrDZfOHqxtJAX5zET","r":""},{"id":"UgkxySxYCWeSMlXxcw_rKRsSAd2YaUTvzWLB","t":"Hill Climb Racing Lite","d":"Play Hill Climb Racing lite! Take on endless hills in this physics-based driving game. Battle the terrain and master the art of uphill racing!","g":"Racing","p":"Fingersoft ","dt":"Oct 8, 2024","i":"https://yt3.ggpht.com/tQrBCECuO9-TPC43k_HDX3_pjqKva70Kmg9iXiYI6dYyCiMs626I1D476CVwRB7yKroPcTZ6nT1y=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxySxYCWeSMlXxcw_rKRsSAd2YaUTvzWLB","r":""},{"id":"UgkxJLegyl7l_uEfda_DHMw0E-QOmO68Y2bD","t":"Homo Evolution","d":"Create your own little world and drive on human evolution. Merge two people and get a new, more modern life form populating the planet","g":"Simulation","p":"CASUAL AZUR GAMES","dt":"Aug 27, 2024","i":"https://yt3.ggpht.com/Gln83zsHx2G-le69ULYHGxG1yPfi7I1XzFIeQmtWV4-iiX3mIA38GGbOndzp-al7e9vyzTPt87VNqA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxJLegyl7l_uEfda_DHMw0E-QOmO68Y2bD","r":""},{"id":"UgkxSGzAGhudV_UETBagHlaIQOGSCFNmB6ZR","t":"Idle Restaurants","d":"Manage your restaurant by training chefs and upgrading equipment. Earn more and more money to make the best restaurant around in this idle clicker.","g":"RPG & Strategy","p":"GameSnacks","dt":"Dec 11, 2023","i":"https://idlerestaurants.h5games.usercontent.goog/v/4ut41titp1kvg/images/idle-restaurants-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxSGzAGhudV_UETBagHlaIQOGSCFNmB6ZR","r":"https://idlerestaurants.h5games.usercontent.goog/v/4ut41titp1kvg"},{"id":"Ugkxfd8gK6BiqBMdomf3KZXFxUWmf1Fa9g8Z","t":"Jetpack Joyride","d":"Multi-award winning, insane, and high flying endless runner game. Fast, furious, and fun arcade gameplay known and beloved by 100M+ devoted fans.","g":"Arcade","p":"Perpetuum Media","dt":"Dec 10, 2024","i":"https://yt3.ggpht.com/sl5rngabE6bG9QDo4GEm5U1DtFEULu1ZCvFlMvGrFmpl06FqUzea9Sghn-I10s8JjQ1EmYdk5o-WOMg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxfd8gK6BiqBMdomf3KZXFxUWmf1Fa9g8Z","r":""},{"id":"UgkxUM_OovhNUNNOxVW0TIU2wk8G7lovh44l","t":"Jewel Shuffle","d":"Swap two adjacent gems to create rows of three or more identical gems. Create longer matches to unlock powerful bonus gems!","g":"Brain & Puzzle","p":"Arkadium","dt":"Apr 22, 2025","i":"https://yt3.ggpht.com/G0mQ9jZbJ67qPJIblMUdoKe80N5FQdFZc83Sz0CeXgkcW_0VAtCpoaD06GDSWVnED_aabWXl3iL5YQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxUM_OovhNUNNOxVW0TIU2wk8G7lovh44l","r":""},{"id":"UgkxWFjPL7QK4ZTpxb948hkyFp3FYBWgyuUD","t":"Jewels Planet","d":"Welcome to the ULTIMATE match-3 puzzle game! Solve addictive puzzles with colorful jewels and hundreds of maps available!","g":"Brain & Puzzle","p":"Voodoo","dt":"Dec 5, 2023","i":"https://yt3.ggpht.com/CV5P7KewoPEzfcZacODFE3PdieqBSGJ40lrR7jESuoBoHk9HWJvic1081Jk58GBY9NU1shCnym4G=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxWFjPL7QK4ZTpxb948hkyFp3FYBWgyuUD","r":""},{"id":"Ugkxfm_XwUsJosq5R3XLMup6JWTaDoXt5qGd","t":"Kings and Queens","d":"Solve challenging solitaire puzzles, complete daily missions, and enjoy a relaxing yet strategic card experience!","g":"Board & Card","p":"Clever Apps Pte. Ltd.","dt":"Apr 29, 2025","i":"https://yt3.ggpht.com/OCKPjGNTK7VYPvW7xBWBIRnzf1jFx-3Vpmq2Ka2arjNNRb4RmjSCxHyvKbuGQQZDX7Dn1ifT6G7s=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxfm_XwUsJosq5R3XLMup6JWTaDoXt5qGd","r":""},{"id":"Ugkx1DoEIsU-uC55wcIa9ggf7w2twl_Cxk0t","t":"Kitchen Bazar","d":"Become the most famous chef in Manhattan!","g":"Brain & Puzzle","p":"Gameloft SE","dt":"Nov 12, 2024","i":"https://yt3.ggpht.com/9FWowGC0Slb-GfkVC7yF2xeSfJQcD_PSCdhLYPEy70dre7_fGM_VHchYbEunGd0TWuvvzG7kjl3CDV4=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx1DoEIsU-uC55wcIa9ggf7w2twl_Cxk0t","r":""},{"id":"UgkxR7Y74YsCcDK04Jggq9fDR2wRhviu8F9_","t":"Knock'em All","d":"Aim, shoot... and blow it all up! Jump from building to building and shoot the dummies to destabilize them and make them fall from the top!","g":"Action","p":"Voodoo","dt":"Dec 19, 2023","i":"https://yt3.ggpht.com/8mi9t24Jr77yXHHTigmp2I4ylWKRA_7LYDAGQBG0pa-fMVh5FNQ5fyx-teMTXZR83iR9KLczC8kacg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxR7Y74YsCcDK04Jggq9fDR2wRhviu8F9_","r":""},{"id":"UgkxTmOh0nUnoFIGsvn5G3j6NH62di-d-N-I","t":"Lake Jump","d":"Jump over the platforms of this mysterious land to explore it and unlock new characters.","g":"Arcade","p":"GameSnacks","dt":"Apr 1, 2025","i":"https://lakejump.h5games.usercontent.goog/v/454vqfvbpqnp0/images/vertical1920.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxTmOh0nUnoFIGsvn5G3j6NH62di-d-N-I","r":"https://lakejump.h5games.usercontent.goog/v/454vqfvbpqnp0"},{"id":"UgkxE-q22w5oWl5AVX83k_W9mm0ZBBEQAxV3","t":"Ludo Karts","d":"","g":"Board & Card","p":"GameSnacks","dt":"Mar 12, 2024","i":"https://35q41h2gp6dd8.h5games.usercontent.goog/v/6q7tggnmscsj8/images/ludo-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxE-q22w5oWl5AVX83k_W9mm0ZBBEQAxV3","r":"https://35q41h2gp6dd8.h5games.usercontent.goog/v/6q7tggnmscsj8"},{"id":"Ugkx84ScJtr7WrAOYsMqNjKBH2xW8hqtE82g","t":"Ludo King™","d":"Ludo King™ - The most popular Ludo game, with 1 billion players worldwide. Pass-and-play & computer mode available to play with friends and family!","g":"Simulation","p":"GAMETION GLOBAL TECHNOLOGIES PTE LIMITED","dt":"May 21, 2024","i":"https://yt3.ggpht.com/rcdAgF0HYV7QEcNtnyKNSoo9B5sW4vLJ56N9lCbiN2Eoj1ZrZpmf-IquLDbPVUXWbglYeoGr7V03=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx84ScJtr7WrAOYsMqNjKBH2xW8hqtE82g","r":""},{"id":"UgkxIVn1k9VWWC8SuuRYORPew8ByV7KJhUFp","t":"Lunch Box Ready","d":"Get ready to embark on a thrilling journey in Lunch Box Ready, where you can unleash your inner organizing champion, lunchbox and fridge organizing!","g":"Simulation","p":"CrazyLabs LTD.","dt":"Apr 30, 2024","i":"https://yt3.ggpht.com/QX1tur2F2g1iWXHha4l_6_GcrK1mxB8NFDGnoHVuSgGRJEbclJDF1NbhRSextnf1MEbSRPfPS7b0ZQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxIVn1k9VWWC8SuuRYORPew8ByV7KJhUFp","r":""},{"id":"UgkxXYFhC4EXAVVe3iriSylT2ObmB8cuVnjT","t":"Magic Cat Academy","d":"Grab your wand and help fend off a ghostly catastrophe. Swipe spells, save your friends, and help restore the peace at the Magic Cat Academy.","g":"Action","p":"Google Doodles","dt":"Oct 31, 2023","i":"https://yt3.ggpht.com/1o5zpDuyiDs_etEPGMugKl7WEEXmSO8A2ef4fGdeGaovTOoijNUioNRUerfOsuuX1RX30oow2csaHA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxXYFhC4EXAVVe3iriSylT2ObmB8cuVnjT","r":""},{"id":"Ugkxxyy0Dtls-hzx1duVf6WZtJgX08RAFjw0","t":"Magic Cat Academy 2","d":"Dive in with Momo the cat to help new friends and reach new depths in her adventure against the Big Boss ghost and its school of ghouls...underwater.","g":"Arcade","p":"Google Doodles","dt":"Oct 31, 2024","i":"https://yt3.ggpht.com/c4kJrxYmOhGmU0pPQK30fW_yti_TwhkYJlhtrFSwF3GpKvLEVcQuhXJPjGsZBIalSgJgqLdoU6_2RA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxxyy0Dtls-hzx1duVf6WZtJgX08RAFjw0","r":""},{"id":"UgkxigXKRfqd3ne0AuaZdM2tYXj0Xec-ceYO","t":"Magic Cat Academy 3","d":"Momo the cat is embarking on an out of this world adventure, battling her arch nemesis, Marshmallow the ghost, across the layers of the atmosphere!","g":"Arcade","p":"Google Doodles","dt":"Dec 3, 2024","i":"https://yt3.ggpht.com/Gb-liHKs38O_vuKMVdd3udzbq2IeMmAII_-yRS3YQuuvuis7Lr5YT-9aXe6LXkdWI1byPNt3r8e4q_c=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxigXKRfqd3ne0AuaZdM2tYXj0Xec-ceYO","r":""},{"id":"UgkxSQfBM8kUdd7BGKO_YTgTGigxHD-bMPxy","t":"Magikmon","d":"Enter Ogdoad's Magic School! Explore mystical gardens, face fantastic creatures, and prove your wizardry.","g":"RPG & Strategy","p":"Ravalmatic","dt":"Feb 11, 2025","i":"https://yt3.ggpht.com/M8FWaPnHwVtfTN4PmsLCQTO4OmuGCaG6ftquu78DQHFirm6oKvXVEXADN5wY9xS5U-DIOto1YGzXr-I=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxSQfBM8kUdd7BGKO_YTgTGigxHD-bMPxy","r":""},{"id":"Ugkx-Dxm4UkuJ_VLOe5QOFVuY0ejlUhzFTKD","t":"Mahjongg Dimensions","d":"Rotate the cube to find and clear matching Mahjong tiles.","g":"Trivia & Word","p":"Arkadium","dt":"Nov 5, 2024","i":"https://yt3.ggpht.com/Iyi6uVBNNRmOQC8O7cvV3Ch-IQzQPHGorzk6QtLOINAtJ8FLYzUheYcg4Ttu-STRECtbe4VGMQN59Q=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx-Dxm4UkuJ_VLOe5QOFVuY0ejlUhzFTKD","r":""},{"id":"UgkxQzSEDZ2AXyZuv7ucRJ2_bPWPSx8KAlI1","t":"Mahjongg Solitaire","d":"Love mahjong? Love solitaire? This popular game combines both.","g":"Board & Card","p":"Arkadium","dt":"Oct 15, 2024","i":"https://yt3.ggpht.com/8DioOYtLUbpFacixYRX0QsiYWVe2uA_QLZAELaXBPgq50Afbey5xnyD15nAHTqMJbbHhM7YMzWF1kg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxQzSEDZ2AXyZuv7ucRJ2_bPWPSx8KAlI1","r":""},{"id":"UgkxsIMTk6Iy34gx5WU30Bl_ofilD55Edub1","t":"Makeup Kit - Color Mixing","d":"The best COLORING MIXING GAME ever! Are you ready to become a makeup artist and make the perfect make up for your eye art?","g":"Simulation","p":"CrazyLabs LTD.","dt":"Jan 9, 2024","i":"https://yt3.ggpht.com/nGUsoDrkegutb43IsaoPQ2vjNNyoJCn9bclKaAeG26AWC3FYQJIzZtm_UYfaZ3RNT3EjYa2XS0Vr=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxsIMTk6Iy34gx5WU30Bl_ofilD55Edub1","r":""},{"id":"UgkxeaSuVoLGFRjV_rT890toRFRaawmGrmYp","t":"Maze Speedrun","d":"Beat the clock in this thrilling maze escape game! How many mazes can you conquer before time runs out?","g":"Arcade","p":"Ravalmatic","dt":"Mar 18, 2025","i":"https://yt3.ggpht.com/HdomxJDB4MSlXo2tdwtwVUTaivLSiDUIXaO_9dJTLkvZ965X5Bmj0zSuQnB-MNjsJSjO-p0JQHUZgA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxeaSuVoLGFRjV_rT890toRFRaawmGrmYp","r":""},{"id":"Ugkx4VMTpA2x9JpAEMJ26bGmfOXDbS-VILPI","t":"Mechangelion - Robot Fighting","d":"Fight robots at the mech arena! Become a real steel warrior in a fun robot game.","g":"Action","p":"Moonee Publishing LTD","dt":"Apr 23, 2024","i":"https://yt3.ggpht.com/5A3fySvc37UOb0vujg62XPxYGnGLnspIjAonP0MTlAIv1SDNx4iqGkdQm6vtLAaubnCVjhQcWs3xCQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx4VMTpA2x9JpAEMJ26bGmfOXDbS-VILPI","r":""},{"id":"UgkxHz3AXHR1bIrgMDRiYWKcLJAE9d0X5K_n","t":"Merge Cakes","d":"Unleash your pastry skills, craft desserts, master recipes, and grow your confectionary empire in this addictive idle game!","g":"Simulation","p":"Ravalmatic","dt":"Jan 28, 2025","i":"https://yt3.ggpht.com/lCTGY5NwLSa9SxvE9h0od___Vz3xI9a6RCiDd11LsaQbr7y8ofzIOPJAbxJCpSfFVAaAPJ7Dt8fk=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxHz3AXHR1bIrgMDRiYWKcLJAE9d0X5K_n","r":""},{"id":"UgkxDyVn-vpQ_a_zdREmvALXokbxh9ey9rTh","t":"Merge Heroes","d":"Merge your heroes into more powerful units in this tower defense game!","g":"RPG & Strategy","p":"GameSnacks","dt":"Jun 7, 2023","i":"https://mergeheroes.h5games.usercontent.goog/v/7r2utkd0ket4o/images/mergeheroes-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxDyVn-vpQ_a_zdREmvALXokbxh9ey9rTh","r":"https://mergeheroes.h5games.usercontent.goog/v/7r2utkd0ket4o"},{"id":"UgkxpYa65s7-EDhr_JUjtXIBDn7DSce4NOZ-","t":"Merge Jewels","d":"It’s a never ending spiral of tap and reward, and it is ultimately satisfying.","g":"Brain & Puzzle","p":"Famobi","dt":"Feb 18, 2025","i":"https://yt3.ggpht.com/G3-GKKfU5PCtkfTaKXx81y_wZPP0g_psDEIrd40wbQ4T5mq2htsxayhyL0cURmxIe4AR-jTwoBHwoso=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxpYa65s7-EDhr_JUjtXIBDn7DSce4NOZ-","r":""},{"id":"Ugkx77Zleo4A6MThiMpKWLI4OuyvzMMoEv-p","t":"Merge Master","d":"Strategy game where you must merge all the dinosaurs to have enough power to fight against the enemies.","g":"Arcade","p":"Homa","dt":"Jan 29, 2024","i":"https://yt3.ggpht.com/Q1G7pY3TS9TNxDZO5fOAsaC10EMznD55VQFVQxXeYBG9vuHLQdfXcP5u3anIWdutlQtyajJM6Tjp=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx77Zleo4A6MThiMpKWLI4OuyvzMMoEv-p","r":""},{"id":"Ugkx0f6kAG5TYHtcKtceb36RYt3ktJs23dyU","t":"Merge Pirates","d":"Combine and upgrade Exploding Pirate Ships in a new tile merge game.","g":"Brain & Puzzle","p":"GameSnacks","dt":"Aug 1, 2023","i":"https://mergepirates.h5games.usercontent.goog/v/6str60bcn31a0/images/mergepirates-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx0f6kAG5TYHtcKtceb36RYt3ktJs23dyU","r":"https://mergepirates.h5games.usercontent.goog/v/6str60bcn31a0"},{"id":"Ugkxmy83UWt6AAOIuGhdnwCYxk5yWsErs5pJ","t":"Mergest Kingdom","d":"Merge, build, and rule your very own kingdom! Combine items to grow your resources and expand your realm in this magical merging adventure.","g":"Brain & Puzzle","p":"Clever Apps Pte. Ltd.","dt":"Oct 15, 2024","i":"https://yt3.ggpht.com/NjGoaqwfbnkrNYb2eg7Qfhup8QzcI3B38g2eeA88-kDuQyjnRnp_d3d0rQ3a100uxDZUcydsvLOeVg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxmy83UWt6AAOIuGhdnwCYxk5yWsErs5pJ","r":""},{"id":"UgkxkE_F3Vax51gnZbVhyiD-NdmIZYf5-dP5","t":"Mob Control HTML5","d":"Aim and shoot at the multiplying gates to create massive mobs and capture all enemy bases!","g":"Action","p":"Voodoo","dt":"Jan 23, 2024","i":"https://yt3.ggpht.com/ZHj7aVG9E_L2KXLvQCWcZ-SgZcsWQLsG8-hGikaO1LWNQlqdD0YJj30t7wrMDkeP-3G83DiibNgRoQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxkE_F3Vax51gnZbVhyiD-NdmIZYf5-dP5","r":""},{"id":"Ugkx7rYBRO3K4pCUgGe7qy9U0xNn7od5Ogf1","t":"Moving Co.","d":"Quickly sort items and place them in boxes in this speed based matching game.","g":"Arcade","p":"GameSnacks","dt":"Jun 22, 2023","i":"https://movingco.h5games.usercontent.goog/v/8fe98e0f-b1b7-4fc6-8023-200af0320f20/high_res_tall.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx7rYBRO3K4pCUgGe7qy9U0xNn7od5Ogf1","r":"https://movingco.h5games.usercontent.goog/v/8fe98e0f-b1b7-4fc6-8023-200af0320f20"},{"id":"Ugkxto-OwJZo4rm8Xl2Nj3K403nHlYThf-sr","t":"My Mini Mart","d":"\"running your own Mini Mart. Grow organic plants, tend to your animals, & sell produce to customers. Hire, Build and Expand!\"","g":"Simulation","p":"Supersonic Studios","dt":"Sep 17, 2024","i":"https://yt3.ggpht.com/HA1P2baH4_tEwWAq6YAVym8Qe4db_tAuBZXesx2q544D2nfOK17IN8-AJAaVKc8cKlansS4ye1vdph0=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxto-OwJZo4rm8Xl2Nj3K403nHlYThf-sr","r":""},{"id":"Ugkx0SCU_1hU4q-k6CHwkNFWa-tQBimsRSZc","t":"My Perfect Hotel","d":"My Perfect Hotel is an idle arcade game that immerses you in the simulation of being a hotel owner.","g":"Arcade","p":"SayGames","dt":"Mar 19, 2024","i":"https://yt3.ggpht.com/eL68x3iKKMvoRiahsQ3bdSYMLuDY4BQIwE5Xp3TO3iP842pW11GVHp8tFMMxsPhnKvb1UXFQPvAdiw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx0SCU_1hU4q-k6CHwkNFWa-tQBimsRSZc","r":""},{"id":"Ugkx3dP_7oSzhOvhc-g2P3z5OPo55Im63OeH","t":"My Space Pet","d":"Earn coins by caring for and playing mini-games with your space pet. Dress it up in a wide variety of outfits and accessories!","g":"Simulation","p":"GameSnacks","dt":"Jun 7, 2023","i":"https://myspacepet.h5games.usercontent.goog/v/6jqt3hoth456g/images/msp-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx3dP_7oSzhOvhc-g2P3z5OPo55Im63OeH","r":"https://myspacepet.h5games.usercontent.goog/v/6jqt3hoth456g"},{"id":"UgkxhUUpYndtiTolpGZWJ_qkpwQePIEhurnK","t":"Northern Heights","d":"Test your snowboarding skills on the Northern Heights! Collect coins, customize your snowboarder, and unloc awesome acrobatic","g":"Arcade","p":"GameSnacks","dt":"Jun 7, 2023","i":"https://northernheights.h5games.usercontent.goog/v/0d890ef5-1cf6-40ff-8d0f-8906ed032d14/high_res_tall.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxhUUpYndtiTolpGZWJ_qkpwQePIEhurnK","r":"https://northernheights.h5games.usercontent.goog/v/0d890ef5-1cf6-40ff-8d0f-8906ed032d14"},{"id":"UgkxiSWh_UPnG4BImBX7gI3KVDLxT2Wm1PiJ","t":"Om Nom Run","d":"Try to run as far as possible by avoiding the dangerous obstacles and enemies, collect coins and transform Om Nom into the fastest runner possible!","g":"Arcade","p":"Famobi","dt":"Aug 15, 2023","i":"https://yt3.ggpht.com/G_9KX8yNLFfAJznm1ug6u6R6kCvgeGUMw2mGj_-YJT4h-iY8Im4J-BszXw1Fsh4iIRVMTcNlxDIx7A=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxiSWh_UPnG4BImBX7gI3KVDLxT2Wm1PiJ","r":""},{"id":"Ugkx3V-HDvjUWsG5X2Xu1-yFzl25wdw3sOjr","t":"Onet Connect Classic","d":"Earn as many points as you can in a cute Mahjong connect game! Your task is to find all pairs before the time is up. How many levels can you beat?","g":"Brain & Puzzle","p":"Famobi","dt":"Aug 15, 2023","i":"https://yt3.ggpht.com/1ZPcGX3wPSdcm1mk2TZvLRbccXkAwJfNqyJjzueX0-KIbZu-Vs2_xVGoK_-AuBitLSqzftv5VBtywtU=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx3V-HDvjUWsG5X2Xu1-yFzl25wdw3sOjr","r":""},{"id":"Ugkxh6_qVyD8REm5RO9C3X1wEpFNk-o3E02t","t":"Pac-Man SuperFast","d":"The classic Pac-Man with a fresh twist! Flashy map, color changes, and blinking effects boost excitement, while skins and stickers add a modern touch","g":"Arcade","p":"RedFox Games","dt":"Oct 22, 2024","i":"https://yt3.ggpht.com/AZLB4wsyuUkIA7WC81s9PUP4mbNdkadfoUfahSF6lFuI-XbmwSZDgJr8rmzUHeEcG2w3VIRpCwvL4Q=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxh6_qVyD8REm5RO9C3X1wEpFNk-o3E02t","r":""},{"id":"UgkxJuWC7NuXgP2-g3P5wL-wQilDuI81Plyd","t":"Paper.io 2","d":"Welcome to the ultimate conquest game! Draw your way to victory and conquer as much territory as possible to beat the competition.","g":"Arcade","p":"Voodoo","dt":"Aug 27, 2024","i":"https://yt3.ggpht.com/RgZHPYuPQWqN3we_8qE5cmKqkfBCBSW4eZVPtW7nmZe5QWsUylZ_2OqNAXLxL-QrWSzxhGHuOe_8zg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxJuWC7NuXgP2-g3P5wL-wQilDuI81Plyd","r":""},{"id":"UgkxMVLzbQGSlLO1s24n9iT4vMJHaGz7jpqA","t":"Parking Jam","d":"Are you ready for the ultimate brain test puzzle games?","g":"Brain & Puzzle","p":"Famobi","dt":"Oct 22, 2024","i":"https://yt3.ggpht.com/B-EbnaOUw3HqKAL6fmEmYuO9rG_iWO69mEPmhH5Ffh6KPCsXji9JUscqDvNYLuQUzLGXn0K75y3C=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxMVLzbQGSlLO1s24n9iT4vMJHaGz7jpqA","r":""},{"id":"UgkxcSxLjNYf58a2lLk63i35dludNosUUk3K","t":"Parking Rush","d":"Immerse yourself in the exciting world of Parking Rush, a top-down puzzle game that tests your strategic thinking and spatial awareness!","g":"Brain & Puzzle","p":" Famobi","dt":"Feb 4, 2025","i":"https://yt3.ggpht.com/OvvaWi5A9_8_HA6Ja19IWKBXvEvxvNaEpae3mOBPujjFZWLhVnhpgh26Dj9mcqpCtTaOhxZtabZGIg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxcSxLjNYf58a2lLk63i35dludNosUUk3K","r":""},{"id":"UgkxTls1MPPPa7ODjUGvnFvPuid7AcanM1Oe","t":"Phone Case DIY","d":"A phone case maker game where you can show your creative side and enjoy the custom art and see the phone evolution just the way you like it!","g":"Simulation","p":"CrazyLabs LTD.","dt":"May 14, 2024","i":"https://yt3.ggpht.com/IDAJWPLMnG7GZqJ9_FPBKvCB-QNIb1GQCoTHSq5bsjYNr0l5oIBdqqEoHJE7aGnV-qjwPPHDX5Um2SY=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxTls1MPPPa7ODjUGvnFvPuid7AcanM1Oe","r":""},{"id":"Ugkxuzx2mGd-dwMxbUnxItW24dUwKwkwDTkL","t":"Pin the UFO","d":"Pull out the pins and get all the aliens onto their spaceship.","g":"Brain & Puzzle","p":"GameSnacks","dt":"Nov 26, 2024","i":"https://pintheufo.h5games.usercontent.goog/v/08ukqv01ac45o/images/hd_res_tall.jpeg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxuzx2mGd-dwMxbUnxItW24dUwKwkwDTkL","r":"https://pintheufo.h5games.usercontent.goog/v/08ukqv01ac45o"},{"id":"UgkxWHqtW1FmHYXkDqChMiDHBk0yfbqSzW1N","t":"Pirate Pop","d":"Ahoy ye matey! Come take a deep dive into Pirate Pop and play through treasure-filled levels in a new bubble shoote game.","g":"Arcade","p":"GameSnacks","dt":"Jun 7, 2023","i":"https://piratepop.h5games.usercontent.goog/v/cc76b73f-af86-4f22-abb6-33b02def4d32/high_res_tall.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxWHqtW1FmHYXkDqChMiDHBk0yfbqSzW1N","r":"https://piratepop.h5games.usercontent.goog/v/cc76b73f-af86-4f22-abb6-33b02def4d32"},{"id":"UgkxUWkNO5JdypVVA1xVMwYrdDNwfzMM5cZz","t":"Pocket Battle Royale","d":"Get new weapons to finish off your enemies with strategy and firepower.","g":"Action","p":"GameSnacks","dt":"Feb 6, 2024","i":"https://pocketbattleroyale.h5games.usercontent.goog/v/7a1tg7kmi4mfg/MarketingAssets/pocketbattleroyale-thumb_tall-1080x1920.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxUWkNO5JdypVVA1xVMwYrdDNwfzMM5cZz","r":"https://pocketbattleroyale.h5games.usercontent.goog/v/7a1tg7kmi4mfg"},{"id":"UgkxnDIbR1K0CiqEgJFWGNKq_2YlG8Au1Vxc","t":"Pocket Champions","d":"Take turns propelling your players into the soccer ball in order to score a goal!","g":"Sports","p":"GameSnacks","dt":"Dec 11, 2023","i":"https://pocketchampions.h5games.usercontent.goog/v/24houhjfrhfi8/images/pocket-champions-tall-banner.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxnDIbR1K0CiqEgJFWGNKq_2YlG8Au1Vxc","r":"https://pocketchampions.h5games.usercontent.goog/v/24houhjfrhfi8"},{"id":"UgkxdwjnVZpLR_KtsTXghj3Bz-TMRpUrrgin","t":"Pokey Ball","d":"Poke everything! Try to poke and flick the ball as high as you can. How high can you go?","g":"Arcade","p":"Voodoo","dt":"Jul 23, 2024","i":"https://yt3.ggpht.com/r4p-P9WlN5tS9H7_xpmcpYsoGCJf1b6PeUxpMASVyrxBcfMH9NPlg1LY0MOmpE7_Lg6C_5GU9A2r92Q=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxdwjnVZpLR_KtsTXghj3Bz-TMRpUrrgin","r":""},{"id":"Ugkxxq7YNquqSSnXq3apf6URu0zrJReBFDpB","t":"Polysphere","d":"Art game is a polygram game where you need to restore pictures by rotating picture pieces.","g":"Brain & Puzzle","p":"Azur Games","dt":"Jul 9, 2024","i":"https://yt3.ggpht.com/m0xenYeFDjah0WOs_MvataDCB9QC5xR-4PWmschbcOsLR1FDEFtfO1BSQA0Los9DI4z6738v20nr7g=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxxq7YNquqSSnXq3apf6URu0zrJReBFDpB","r":""},{"id":"UgkxILTVS0T0qsRorQmdd1OhPDkCI4cinIiu","t":"Pou","d":"Feed it, clean it, play with it and watch it grow up while leveling up and unlocking outfits to satisfy your taste. How will YOU customize your POU?","g":"Simulation","p":"Perpetuum Media","dt":"Nov 12, 2024","i":"https://yt3.ggpht.com/Ia3mJ92yF8g3L5J4JwrtyvSeYEgrOi_fkqygi2tkbGfzFidS3DSTq8PwrAevJS7xZnig1Rz0KKLXEwQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxILTVS0T0qsRorQmdd1OhPDkCI4cinIiu","r":""},{"id":"Ugkxk2s909MfhKr5zKwZUPbZdgwXin8tKptu","t":"Race Master 3D","d":"Race Master is a racing game that’s easy to play with exciting and endless variation of tracks, cool cars and dangerous rivals","g":"Racing","p":"SayGames LTD","dt":"Oct 8, 2024","i":"https://yt3.ggpht.com/7G9Nrz36CN7ESJrMfgj1njofr0CyH-dV0vrHX0-8408bPAAURwuGrNmRPbebOfZJje3RghYTLKeP=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxk2s909MfhKr5zKwZUPbZdgwXin8tKptu","r":""},{"id":"UgkxARjhkMHAuyc5hdElO22cec1cTa4Cnkda","t":"Rainy Boba Cafe","d":"\"\"Rainy Boba Cafe\"\" is a Google Doodle game created to celebrate bubble tea, also known as boba tea and pearl milk tea.","g":"Simulation","p":"Google Doodles","dt":"Oct 24, 2023","i":"https://yt3.ggpht.com/sN0HUAfqgLzqSKOIk72T4ocmptc0TGgv2jmj6SK7NuMqhTQOv79yTmPVEZb6qyYMUCKTX3EDUI3l5A=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxARjhkMHAuyc5hdElO22cec1cTa4Cnkda","r":""},{"id":"Ugkx7v1VWZiEyGa9SIDBR2wtJuWaVGjkRDz8","t":"Real Football","d":"Build and lead your dream team to the championship!","g":"Sports","p":"Gameloft SE","dt":"Nov 5, 2024","i":"https://yt3.ggpht.com/UvnXlv_pkJGBMx0pu-3MAFx4Qv_K4Ap2hfJSubi2-n1cTmrOZ0xK8jOsfqAjkyFAKSMWEGflH9L6iQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx7v1VWZiEyGa9SIDBR2wtJuWaVGjkRDz8","r":""},{"id":"UgkxBtpb3hisyNhrNkU215QuFIRfmNBgJ0m4","t":"Retro Drift","d":"Drift and skid your car in Retro Drift! Drift left and right with good timing. Concentrate and anticipate your drifts and skids in tight spots. How…","g":"Racing","p":"GameSnacks","dt":"Mar 5, 2024","i":"https://retrodrift.h5games.usercontent.goog/v/3jr7fjtqu0j18/media/graphics/promo/banners/1080x1920.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxBtpb3hisyNhrNkU215QuFIRfmNBgJ0m4","r":"https://retrodrift.h5games.usercontent.goog/v/3jr7fjtqu0j18"},{"id":"Ugkxxll7kTr4LhP4-4IhRuQtaKFZuQDOPSiD","t":"RingyDingy","d":"Use your DJ deck to connect tracks and keep the futuristic nightclub alive with epic beats!","g":"Brain & Puzzle","p":"Ravalmatic","dt":"Feb 18, 2025","i":"https://yt3.ggpht.com/rqN5-NszffPsn0kpQXnc3xWEehgwD4eqlzp3K1_DJ0e7qXA3haCaJiT2695c8KCHZZ0niC7xynAwdw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxxll7kTr4LhP4-4IhRuQtaKFZuQDOPSiD","r":""},{"id":"Ugkx-EeJ7qwRWOfsYV4bglM0qUD1FqDkadIb","t":"Room Sort","d":"The ultimate free puzzle game that combines the fun of tangram puzzles with the creativity of home design","g":"Brain & Puzzle","p":"Gamincat, Inc","dt":"Apr 29, 2025","i":"https://yt3.ggpht.com/ZfA5ajOlOixFpF1pnVZGht8HRQcuY52wuxpHIy0VXyMxdc421iIZaFzElVG59BG7dDpcsAdFhtRUGg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx-EeJ7qwRWOfsYV4bglM0qUD1FqDkadIb","r":""},{"id":"UgkxSn6arpQ-bwXk8YOEjg-y0JFVHzfucj16","t":"Running Pet Dec Room","d":"Running Pet is an endless game where you help Sunny Cat build a dream home by collecting coins and dodging obstacles.","g":"Action","p":" IVYMOBILE INTERNATIONAL ENTERPRISE LIMITED","dt":"Feb 13, 2024","i":"https://yt3.ggpht.com/1XXmXLhZM2_bpx_kjjdHkxMVllstQm_lefXR6oYQgllCTJhNAsBw4Ww0fUII8quCeqMPUNkcoswe=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxSn6arpQ-bwXk8YOEjg-y0JFVHzfucj16","r":""},{"id":"Ugkx9AqIHXEy1VSmCJWSj5oWo4rJliZUgNPX","t":"Satisdom","d":"It's time to escape into an ultimate chill & relaxation with Satisdom","g":"Brain & Puzzle","p":"ABI GAME STUDIO","dt":"Jan 7, 2025","i":"https://yt3.ggpht.com/jWoOxuvfj6mX1mdtxCc4QO1nwR6JTehq7uBnDbra_QFxAHfjkAMqaENJgZs2mzHDNQk3kZKmXQav=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx9AqIHXEy1VSmCJWSj5oWo4rJliZUgNPX","r":""},{"id":"UgkxeIG5erzthQsBVVs1sCMhJTrLdLAb7v5c","t":"Scooter Xtreme","d":"Ride your scooter and pull of extreme jumps and flips in this racing game.","g":"Racing","p":"GameSnacks","dt":"Jun 7, 2023","i":"https://scooterxtreme.h5games.usercontent.goog/v/c842db43-7823-45bc-b575-acbd9bda5de4/high_res_tall.jpg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxeIG5erzthQsBVVs1sCMhJTrLdLAb7v5c","r":"https://scooterxtreme.h5games.usercontent.goog/v/c842db43-7823-45bc-b575-acbd9bda5de4"},{"id":"Ugkxe73dhfx91DQ3kG2ARebAOoDSFbSfHv2p","t":"Sculpt People","d":"simulation pottery game, where you can satisfy customers by sculpting amazing 3D models with clay dough!","g":"Simulation","p":"CrazyLabs","dt":"May 28, 2024","i":"https://yt3.ggpht.com/maKR3TgVQChpO5Q6v2qodlPvvNIu0LUlYZh8aYih5a-zkYc3_3fxdCGEMIaH5QulgBl01HDf9Sablg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxe73dhfx91DQ3kG2ARebAOoDSFbSfHv2p","r":""},{"id":"Ugkxg8pGToFkef0ZZS87GFq6y0rtCdwJy3MY","t":"Skincare Time: Makeover ASMR","d":"Skincare Time: Makeover ASMR has 40+ levels of relaxing mini-games like skincare, makeup, tidying, and pet care, with soothing ASMR and easy controls.","g":"Brain & Puzzle","p":"Cone Limited","dt":"May 6, 2025","i":"https://yt3.ggpht.com/M6I_dfkikxJpYMHQ6hZOgIcqI1n5aKsNF_qjg-L-BpNYy_WJjYQ9PIr3TEirbIWmrFlAnnAzDJLx=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxg8pGToFkef0ZZS87GFq6y0rtCdwJy3MY","r":""},{"id":"UgkxL3SoK1bXuffeVzvH1UPMHuz0YH2AYn_l","t":"Slice It All!","d":"Tap to flip the knife and slice amazing obstacles in the juiciest way! Cut or slice everything and become the slice master!","g":"Arcade","p":"Voodoo","dt":"Apr 4, 2024","i":"https://yt3.ggpht.com/7s6QE0WdVWDZqN-3iLHgGxB6MxEM2e_Jv9SBbOKTHmcs3xceTjbfO-3D1deLwkH194cdYYen3IKnMDk=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxL3SoK1bXuffeVzvH1UPMHuz0YH2AYn_l","r":""},{"id":"UgkxCPSyzGC7X7P8rw8sEmPuv82HB_nEXWt8","t":"Slime.io","d":"Devour other slimes to grow larger and avoid getting devoured yourself.","g":"Arcade","p":"GameSnacks","dt":"Feb 27, 2024","i":"https://slime-io.h5games.usercontent.goog/v/2hm4kteums0i8/MarketingAssets/SlimeIO_Thumb_Tall_1080x1920.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxCPSyzGC7X7P8rw8sEmPuv82HB_nEXWt8","r":"https://slime-io.h5games.usercontent.goog/v/2hm4kteums0i8"},{"id":"UgkxHHtsak1SC8mRGHMZewc4HzeAY3yhPPmJ","t":"Stack Bounce","d":"Time your taps to smash through a tower of colorful blocks.","g":"Arcade","p":"GameSnacks","dt":"Jun 15, 2023","i":"https://stackbounce.h5games.usercontent.goog/v/1aqsvv0aegbjg/images/hd_res_tall.jpeg=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxHHtsak1SC8mRGHMZewc4HzeAY3yhPPmJ","r":"https://stackbounce.h5games.usercontent.goog/v/1aqsvv0aegbjg"},{"id":"UgkxabnI9-EeP8kkKimFtn-IAclqyQFmK_j0","t":"Stacky Dash","d":"Swipe your finger to dash your hero across the mazes, stack up the tiles higher and higher and reach for the skies!!!","g":"Brain & Puzzle","p":"Supersonic Studios","dt":"Sep 3, 2024","i":"https://yt3.ggpht.com/jBmUuw_TpjsYHKggzeICMlWjlOtAL-_4WxvXB6wqLgHrqX_H4a5TAzVgyvL27uJ7MiYqmRk9xo07iA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxabnI9-EeP8kkKimFtn-IAclqyQFmK_j0","r":""},{"id":"Ugkxl5VAVrIKHF5GRmanrMwq2VtumP3V6uOw","t":"State.io","d":"Abstract real-time strategy game, a tactical clash of dots, and an exciting countries takeover. Fight against armies by solving strategic puzzles.","g":"Action","p":"AZUR INTERACTIVE GAMES LIMITED","dt":"Aug 15, 2023","i":"https://yt3.ggpht.com/FIJ0jE06Erdqk3ZhmsDcmecyYFmqoReVVjp6-SRODEX4AmlAlvnqvE1xvcYgdmlmGEKPoQWf9L8FzL0=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxl5VAVrIKHF5GRmanrMwq2VtumP3V6uOw","r":""},{"id":"UgkxAa2Gygx3bQRx4kOraVwUFW_3mO1tH0h5","t":"Stealth Master","d":"Prove your ninja skills by creeping through the shadows and taking out bad guys","g":"Action","p":"SayGames","dt":"Apr 18, 2024","i":"https://yt3.ggpht.com/q5ANnCdGhOD3dhbJWAG3I3uode4P1Dpfw7VT0sPr5bQK3_2wOCf9GFey_C6Eym8wuj11slA56wGC=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxAa2Gygx3bQRx4kOraVwUFW_3mO1tH0h5","r":""},{"id":"Ugkxuu6Lk-sBMQPT2sliNGpkpCWPXx2sLf7q","t":"Super Goal","d":"Draw a line to kick the ball. The direction and route of the ball are controlled by you. Use your wisdom to solve puzzles and score top notch goals!","g":"Sports","p":"Gamegou Limited","dt":"Nov 14, 2023","i":"https://yt3.ggpht.com/nGfk7I_jL0_MBA0PFih8j8J6AOlMlxALWCDOkgWputmtGAlyp8H2OcupMsd5uYTM_V2A7Y2xIQ6LbQ=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxuu6Lk-sBMQPT2sliNGpkpCWPXx2sLf7q","r":""},{"id":"UgkxW9qK0UbiouOvSOGkOqC2YPpNmDHgYeQJ","t":"Supreme Duelist","d":"Supreme Duelist is a fun stickman fighting game.","g":"Action","p":"Neron's Brother","dt":"Sep 24, 2024","i":"https://yt3.ggpht.com/I7nZyWSaA60dwkta12w30O4xBmDffGEIQ9Bu7wPHRSrAhTzpOykiZbRyDzGps9tjrRWOYw_I44ya=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxW9qK0UbiouOvSOGkOqC2YPpNmDHgYeQJ","r":""},{"id":"UgkxXctP_Zj8QDUv5p9LsYCuW_xF9jM-P55w","t":"Sushi Grab","d":"Fulfill customer orders by grabbing the right sushi from the conveyer.","g":"Action","p":"GameSnacks","dt":"Jul 16, 2024","i":"https://sushigrab.h5games.usercontent.goog/v/0ehlec2inmmrg/marketingAssets/SushiGrab-vertical-banner1.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxXctP_Zj8QDUv5p9LsYCuW_xF9jM-P55w","r":"https://sushigrab.h5games.usercontent.goog/v/0ehlec2inmmrg"},{"id":"UgkxXdDZHN0YAZBKap6geOAu2MySTC3-wu-V","t":"Sushi Roll","d":"You are shrimply the best! In this endless-runner you whiz straight through the asian kitchen with one of many super tasty sushi-rolls!","g":"Arcade","p":"Famobi","dt":"Apr 8, 2025","i":"https://yt3.ggpht.com/TLdLPxHY9i3rFYE1YHk6u1kPSto0VUEqF05Jss01rOMS4nl6BY8vEJYJylijDyLQST15yRVWzhT3Nao=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxXdDZHN0YAZBKap6geOAu2MySTC3-wu-V","r":""},{"id":"UgkxFQtI21tiK7V0FmAFLgU2Ew2ZUwqhN9KU","t":"Sword Play","d":"Sharpen your blade, sword master! Complete samurai missions to unlock the most dangerous swords in the world!","g":"Action","p":"Azur Games","dt":"Jul 2, 2024","i":"https://yt3.ggpht.com/F5XGF4eYotNhNtnxUm5ArFjf8dqjLZyAgwosDZACXT6Xt4AiU1n6WQ7dw6qxtwD-FjRsnUAviP59=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxFQtI21tiK7V0FmAFLgU2Ew2ZUwqhN9KU","r":""},{"id":"UgkxjfTaD53xDls6vMe5pPVU-gWXQZ6uDBKt","t":"Table Tennis World Tour","d":"Win the World Championship in this 3D Ping Pong Game with realistic physics!","g":"Sports","p":"Famobi","dt":"Feb 25, 2025","i":"https://yt3.ggpht.com/oHJ1-5R0ThwBHyuQFTS7L1Xh6TK-S9xM56-N2Sk0hdVsiR-auqGXsJm4alN24b5bph2B4E4_yRAtgCI=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxjfTaD53xDls6vMe5pPVU-gWXQZ6uDBKt","r":""},{"id":"UgkxWYxG29y8GASEQHhWfPBFlUdwNwfCQEUK","t":"Tall Man Run","d":"Tall Man Run is a game where you collect the highest numbers to grow taller and stronger as you race towards a giant enemy.","g":"Action","p":"Supersonic Studios","dt":"Feb 20, 2024","i":"https://yt3.ggpht.com/y75kXNfCeZIwG5GSe-CS08VlgnWk5ksy_Kn4rWXJmzBFCQmchuYS88LsWJiR_NPgJNDA6nDHcKZpsw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxWYxG29y8GASEQHhWfPBFlUdwNwfCQEUK","r":""},{"id":"UgkxiVJP19-_42X7VwqXj5Rs6-bCQLXvXRNC","t":"Texas Hold'em Poker","d":"Compete if you think your cards can't be beaten! Or if you're feeling risky, go for a bluff. Poker is an intense combination of skill and luck","g":"Board & Card","p":"Arkadium","dt":"Apr 15, 2025","i":"https://yt3.ggpht.com/Pdml9aHLpxfQCJmanf3kOCbENC0a6gjTv3SLuGh_n5T8MzBTduGlM_rjl69ADL_gN-QY1PcwxlJzIw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxiVJP19-_42X7VwqXj5Rs6-bCQLXvXRNC","r":""},{"id":"UgkxF2j4WnOR1kzNBZ1mbhjKyEGLxfAWiOw8","t":"Thief Puzzle","d":"Thief Puzzle is a fun and addictive puzzle game that includes escape games, brain tests, and robbery games to test your IQ and problem-solving skills.","g":"Brain & Puzzle","p":"Famobi","dt":"Aug 13, 2024","i":"https://yt3.ggpht.com/-naWLoHd3vZve7PP4cSMD0cahxNWdssubyNo-_I3Vq8hEJU6NQigR4YfQgn2FQYgXwtz-iWn87sd=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxF2j4WnOR1kzNBZ1mbhjKyEGLxfAWiOw8","r":""},{"id":"Ugkx37BqByp15PUK6An6DLFaBtT6mi40ZoZ3","t":"Tiletopia","d":"Use your logic and strategy to plan a futuristic city in harmony with nature in this peaceful and pleasant game.","g":"Brain & Puzzle","p":"GameSnacks","dt":"Dec 3, 2024","i":"https://6nilllqpgkm6o.h5games.usercontent.goog/v/7d3689i7s5gfo/MarketingAssets/tiletopia-thumb-tall-1080x1920.png=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx37BqByp15PUK6An6DLFaBtT6mi40ZoZ3","r":"https://6nilllqpgkm6o.h5games.usercontent.goog/v/7d3689i7s5gfo"},{"id":"Ugkx50b0MgNtw5-tLByRcmclUYxr_TUmouLk","t":"Today's Hurdle","d":"Challenge yourself with 5 times the brain-training fun in this new word game with a twist. Will you solve all Hurdles and make it to the finish line?","g":"Trivia & Word","p":"Arkadium","dt":"Jul 25, 2023","i":"https://yt3.ggpht.com/9d_a5Mne-hyh-8-h4XEXA6JNtBV13akkeGlb8z3XxXPqaozPs4eOfolqWI21S1YHk2Swu9TqFnij=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx50b0MgNtw5-tLByRcmclUYxr_TUmouLk","r":""},{"id":"UgkxKXJt3Dp8gutdeca9P-UpEM3LLaeDffpa","t":"Tomb of the Mask","d":"Tomb of the Mask is a challenging arcade vertical adventure. Climb walls, evade traps, and conquer the ever-changing labyrinth!","g":"Action","p":"Playgendary Limited","dt":"Dec 19, 2023","i":"https://yt3.ggpht.com/aIgdPp4NP-yZ26lt20sj3-oGDxTMUrqHXex6LTrs1rga-UsGuMMmsObocRWAdfSMG0qqto6oB9fq0eU=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxKXJt3Dp8gutdeca9P-UpEM3LLaeDffpa","r":""},{"id":"UgkxNh6C069nBkRD0rUbf66TRvjOUmeLhC7e","t":"Totemia: Cursed Marbles","d":"Totemia is the perfect game for all Match 3 fans that want a little more action and excitement!","g":"Brain & Puzzle","p":"Famobi","dt":"Mar 18, 2025","i":"https://yt3.ggpht.com/vpN1w9hoOb3INWCgu0xs02LZq5sshdTW1Qv0E9z1U2xdMSztCKtTI-oPv9nxOa_s3eZuMKCVQzkG8w=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxNh6C069nBkRD0rUbf66TRvjOUmeLhC7e","r":""},{"id":"UgkxEyXhlGYRzXZ-PHjVq5a6nSlRhFRYJIYk","t":"Tower Crash 3D","d":"Crash the Tower! Only the best crashers will be able to destroy all towers in this 3D physics game!","g":"Action","p":"Famobi","dt":"Jan 28, 2025","i":"https://yt3.ggpht.com/oYGRUfEsbgKUnI9Wjk0OxgtrTfl21RCv-IHH82HBnTx3TjTJuNR3v6rz1O0alIXp-Uyq0pfyM03oLCc=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxEyXhlGYRzXZ-PHjVq5a6nSlRhFRYJIYk","r":""},{"id":"UgkxfKri7hfiRMnRbdGkN-SLmF6YjBPnvism","t":"Trivia Crack","d":"Step up your quiz game by answering fun trivia questions! Challenge your knowledge and prove you are the smartest in this brain test!","g":"Trivia & Word","p":"etermax","dt":"Mar 5, 2024","i":"https://yt3.ggpht.com/_2WDRi7z8HC6jc_Tya8F8IN2fc8ivqXFoa1KTSePfzT6ba8XENQxXEI3igNiqnsktrFATGYFDPK9LEE=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxfKri7hfiRMnRbdGkN-SLmF6YjBPnvism","r":""},{"id":"UgkxaQ7Prff5pYiQ5676g8Nvhm9B3GswNUg6","t":"Tropical Merge","d":"Explore the mysteries of the islands, help the locals, and turn your little piece of paradise into a thriving eco-friendly haven.","g":"Simulation","p":"Clever Apps Pte. Ltd.","dt":"Sep 3, 2024","i":"https://yt3.ggpht.com/SooInaRpD9Rkkz8tZbZiI18mY6agsv41G23GzsOqBQbE3cDGN-PgJKrDJFhG7xA7W7nOL1l4hfmERw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxaQ7Prff5pYiQ5676g8Nvhm9B3GswNUg6","r":""},{"id":"Ugkx8eqwWlf7fJiVSU7f7LL62Vp0cucAs3a-","t":"Turbo Stars","d":"Race on a wide variety of exhilarating tracks and defeat your opponents","g":"Racing","p":"SayGames","dt":"Jan 16, 2024","i":"https://yt3.ggpht.com/v6fooKZ0CG-x3TrbnLtUMfxBioHzs7qdfCvB1-EV64lT_zEfW5nnewAfOsIZjti9THKuNL77wNbt4A=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkx8eqwWlf7fJiVSU7f7LL62Vp0cucAs3a-","r":""},{"id":"UgkxoDzPFlDzIEqNDQBG4dDTvhdUd3ICMl8q","t":"Wood Nuts & Bolts","d":"Wood Nuts & Bolts Puzzle, a new free game that'll boost your IQ by unscrewing the wood nuts, puts your quiz-solving skills to the test!","g":"Brain & Puzzle","p":"ABI GAME STUDIO","dt":"Jun 4, 2024","i":"https://yt3.ggpht.com/KGbQi8mxE7YR6QDyhhSBYqc9xZI8lg_fXf3VjIzRBkiN1zHXMbDMB8J3NIP7WIxcr7QK81QOifqY=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxoDzPFlDzIEqNDQBG4dDTvhdUd3ICMl8q","r":""},{"id":"Ugkxr1e5drFHD3ncx0IFM8IbU6NBZ5kdXhAS","t":"Word Search Explorer","d":"In the game, users swipe to find words hidden within a letter grid, all of which are related to a common theme.","g":"Trivia & Word","p":"Playsimple Games Pte. Ltd.","dt":"Mar 25, 2025","i":"https://yt3.ggpht.com/Tvo_QWL_TyCMKPaIDqZdOgR01vH3J71sPfQBnPHZWYTJojWcCLqUj0n5c-ZPiEJr6PimGNE-po7fU70=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxr1e5drFHD3ncx0IFM8IbU6NBZ5kdXhAS","r":""},{"id":"Ugkxbre9EsQ4YoOidwVm990R03VuWyjX2Cw1","t":"Word Wipe","d":"Form as many words as you can to clear the rows and advance.","g":"Trivia & Word","p":"Arkadium","dt":"Oct 8, 2024","i":"https://yt3.ggpht.com/3iGZ4HAJr0wi1yOEedBphuymx1YoCRXRWCrAoPGiMsC3Xd1qy1rpp9xVuuEnKTuqpE877tR9B8S1zw=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxbre9EsQ4YoOidwVm990R03VuWyjX2Cw1","r":""},{"id":"UgkxPFCtv4YicBUoaAB3qI5p2_k96YzBpj0x","t":"Words of Wonders","d":"Unleash your inner wordsmith and collect world wonders in Words of Wonders - the ultimate crossword puzzle game!","g":"Trivia & Word","p":"Famobi","dt":"Aug 15, 2023","i":"https://yt3.ggpht.com/dVNnp8rjF_qwyfJa5RPp2vIxlTLbd9iyaGU0qAjomJ4MFt6zKQBeHE3Md-2KFFq-2S1UtR5w8g6U=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxPFCtv4YicBUoaAB3qI5p2_k96YzBpj0x","r":""},{"id":"Ugkxpz0Bcp4WK0ZLjhHhq2IrpxQmwmwB9md9","t":"Words of Wonders: Guru","d":"Travel around the world, find the words and become the Guru of your language!","g":"Trivia & Word","p":"Fugo Games","dt":"May 9, 2024","i":"https://yt3.ggpht.com/Bv3O4LzQRqKgAfd8GAnkJoJhTdxHoLXWd8fj35np-vtZpcs5Lnb6GinUjl3Ja5bjKjXzeqjqFgVp=s288-rw-nd-v1","u":"https://www.youtube.com/playables/Ugkxpz0Bcp4WK0ZLjhHhq2IrpxQmwmwB9md9","r":""},{"id":"UgkxQ93xbDxQOKBFHRxevZRTHAWXkAOprPGK","t":"Zoo - Happy Animals","d":"Complete different tasks to keep the animals happy in this colorful, delightful zoo simulator that covers all aspects of zoo life and animal care.","g":"Simulation","p":"SayGames LTD","dt":"Apr 23, 2024","i":"https://yt3.ggpht.com/m9Aa87sOpOVECDsBv8E_uf9OBy_MSm737BNYC6YsCgX45Vvn_dww1LYjDsAourWCIC5jWle_RNXq=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxQ93xbDxQOKBFHRxevZRTHAWXkAOprPGK","r":""},{"id":"UgkxhWD6uplVlFU1z3h-k2JGoP-QFHYfAC2f","t":"Zoo Boom","d":"Join the ultimate puzzle game adventure and match cute animal cubes!","g":"Brain & Puzzle","p":"Famobi","dt":"Mar 11, 2025","i":"https://yt3.ggpht.com/TiE-aKBOTUnyZsUH2R8EoAcWz5CpEdFMIdpAx6h9sldjWtUBfNjf4nsX4nZ09auNinONhRYKFlVvWA=s288-rw-nd-v1","u":"https://www.youtube.com/playables/UgkxhWD6uplVlFU1z3h-k2JGoP-QFHYfAC2f","r":""}];
+let GAME_CLEANUP=null;
+function cleanupGame(){
+  if(GAME_CLEANUP){try{GAME_CLEANUP()}catch(e){}GAME_CLEANUP=null;}
+}
+function bestKey(id){return 'yt-play-best-'+id;}
+function getBest(id){try{return Number(localStorage.getItem(bestKey(id)))||0}catch(e){return 0}}
+function setBest(id,n){try{localStorage.setItem(bestKey(id),String(n))}catch(e){}}
+function setGameScore(n){const e=$('gameScore');if(e)e.textContent=n;}
+function setGameBest(n){const e=$('gameBest');if(e)e.textContent=n;}
+function gameHelp(text){const e=$('gameHelp');if(e)e.textContent=text;}
+function showGameOver(msg){
+  const st=$('gameStage');
+  if(!st||st.querySelector('.game-over')) return;
+  const d=document.createElement('div');
+  d.className='game-over';
+  d.innerHTML='<div><b>Game over</b><p>'+esc(msg||'Try again!')+'</p><button class="game-btn" id="gameAgain">Play again</button></div>';
+  st.appendChild(d);
+}
+function officialList(){
+  const q=S.offQuery.trim().toLowerCase();
+  return OFFICIAL_GAMES.filter(g=>{
+    if(S.offFilter!=='All'&&g.g!==S.offFilter) return false;
+    return !q||(g.t+' '+g.d+' '+g.p+' '+g.g).toLowerCase().includes(q);
+  });
+}
+function officialCountText(n){return n===1?'1 game':n+' games';}
+function officialCards(){
+  const list=officialList();
+  if(!list.length) return '<div class="empty" style="grid-column:1/-1"><b>No games found</b>Try another search or genre.</div>';
+  const palettes=[['#ff8a65','#c62828'],['#4fc3f7','#1565c0'],['#81c784','#2e7d32'],['#ba68c8','#6a1b9a'],['#ffd54f','#f57f17'],['#4dd0e1','#00838f']];
+  return list.map((g,idx)=>{
+    const p=palettes[idx%palettes.length];
+    return '<div class="play-card official" data-official="'+esc(g.id)+'">'
+    +'<div class="play-thumb img" style="background:linear-gradient(135deg,'+p[0]+','+p[1]+')"><img src="'+esc(g.i)+'" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">'
+    +'<span class="play-badge">'+esc(g.g)+'</span><span class="play-play">'+Svg('play',20)+'</span></div>'
+    +'<div class="play-card-body"><h3 class="play-card-title">'+esc(g.t)+'</h3>'
+    +'<p class="play-card-desc">'+esc(g.d)+'</p>'
+    +'<div class="play-card-meta"><span>'+esc(g.p)+'</span><span class="play-best">Official</span></div>'
+    +'</div></div>';
+  }).join('');
+}
+function renderPlayables(){
+  const genres=['All'].concat([...new Set(OFFICIAL_GAMES.map(g=>g.g))].sort());
+  playablesView.innerHTML='<div class="playables">'
+   +'<div class="play-head"><button class="shorts-back" id="playBack">'+Svg('back',18)+' Back</button>'
+   +'<h1>'+Svg('playables',28)+' Playables</h1></div>'
+   +'<p class="play-sub">Take a break with quick games you can play right here — no downloads, no setup.</p>'
+   +'<div class="play-section"><div class="play-section-head"><h2>Play now</h2>'
+   +'<span>Built into this page — no external game host needed</span></div>'
+   +'<div class="play-grid">'+GAMES.map(g=>{
+      const best=getBest(g.id);
+      return '<div class="play-card" data-game="'+g.id+'">'
+       +'<div class="play-thumb" style="background:linear-gradient(135deg,'+g.c1+','+g.c2+')">'
+       +'<span class="play-badge">'+esc(g.category)+'</span>'+g.icon
+       +'<span class="play-play">'+Svg('play',20)+'</span></div>'
+       +'<div class="play-card-body"><h3 class="play-card-title">'+esc(g.title)+'</h3>'
+       +'<p class="play-card-desc">'+esc(g.desc)+'</p>'
+       +'<div class="play-card-meta"><span>Play now</span><span class="play-best">'+(best?'Best '+best:'New')+'</span></div>'
+       +'</div></div>';
+    }).join('')+'</div></div>'
+   +'<div class="play-section"><div class="play-section-head"><h2>Official Playables</h2>'
+   +'<span id="officialCount">'+officialCountText(officialList().length)+'</span></div>'
+   +'<div class="off-toolbar"><input id="offSearch" class="off-search" type="search" placeholder="Search Playables" value="'+esc(S.offQuery)+'">'
+   +genres.map(g=>'<button class="off-chip'+(S.offFilter===g?' active':'')+'" data-genre="'+esc(g)+'">'+esc(g)+'</button>').join('')
+   +'</div><div class="play-grid" id="officialGrid">'+officialCards()+'</div>'
+   +'<p class="play-note">Official Playables are hosted by YouTube, so opening one will take you to youtube.com in a new tab. The games above run directly in this page.</p>'
+   +'</div></div>';
+}
+function renderOfficialDetail(id){
+  const g=OFFICIAL_GAMES.find(x=>x.id===id);
+  if(!g){renderPlayables();return;}
+  playablesView.innerHTML='<div class="playables"><div class="play-head">'
+   +'<button class="shorts-back" id="gameBack">'+Svg('back',18)+' All Playables</button></div>'
+   +'<div class="off-detail"><img class="off-detail-img" src="'+esc(g.i)+'" alt="" onerror="this.style.display=\'none\'">'
+   +'<div><h2>'+esc(g.t)+'</h2>'
+   +'<div class="off-meta">'+esc(g.g)+' • '+esc(g.p)+' • '+esc(g.dt)+'</div>'
+   +'<p>'+esc(g.d)+'</p>'
+   +'<div class="off-actions"><a class="game-btn" href="'+esc(g.u)+'" target="_blank" rel="noopener noreferrer">Play on YouTube</a>'
+   +'<button class="game-btn alt" id="gameHome">Back to Playables</button></div></div></div></div>';
+}
+function gameShell(g){
+  return '<div class="game-view">'
+   +'<div class="game-top"><button class="shorts-back" id="gameBack">'+Svg('back',18)+' All games</button>'
+   +'<h1>'+g.icon+' '+esc(g.title)+'</h1>'
+   +'<button class="game-btn alt" id="gameRestart">Restart</button></div>'
+   +'<div class="game-layout"><div class="game-area" id="gameStage"></div>'
+   +'<div class="game-side"><div class="game-stat"><b>Score</b><span id="gameScore">0</span></div>'
+   +'<div class="game-stat"><b>Best</b><span id="gameBest">'+getBest(g.id)+'</span></div>'
+   +'<div class="game-help" id="gameHelp"></div>'
+   +'<button class="game-btn" id="gameHome">Back to Playables</button></div></div></div>';
+}
+function game2048(stage){
+  let b=Array(16).fill(0),score=0,best=getBest('2048');
+  stage.innerHTML='<div class="g2048"><div class="g2048-top"><div><b>Score</b><span id="gScore">0</span></div>'
+   +'<div><b>Best</b><span id="gBest">'+best+'</span></div></div><div class="g2048-grid" id="gGrid"></div></div>';
+  const grid=stage.querySelector('#gGrid');
+  function draw(){
+    grid.innerHTML=b.map(v=>'<div class="t t'+v+'">'+(v||'')+'</div>').join('');
+    stage.querySelector('#gScore').textContent=score;
+    setGameScore(score);
+    if(score>best){best=score;setBest('2048',best);setGameBest(best);stage.querySelector('#gBest').textContent=best;}
+  }
+  function add(){
+    const e=[];for(let i=0;i<16;i++)if(!b[i])e.push(i);
+    if(!e.length)return;
+    const i=e[Math.floor(Math.random()*e.length)];
+    b[i]=Math.random()<.9?2:4;
+  }
+  function canMove(){
+    if(b.some(v=>!v))return true;
+    for(let r=0;r<4;r++)for(let c=0;c<3;c++){
+      if(b[r*4+c]===b[r*4+c+1])return true;
+      if(b[c*4+r]===b[(c+1)*4+r])return true;
+    }
+    return false;
+  }
+  function move(dir){
+    const before=b.join(',');
+    const groups=[];
+    if(dir==='left'||dir==='right'){for(let r=0;r<4;r++)groups.push([0,1,2,3].map(c=>r*4+c));}
+    else{for(let c=0;c<4;c++)groups.push([0,1,2,3].map(r=>r*4+c));}
+    const rev=(dir==='right'||dir==='down');
+    groups.forEach(gr=>{
+      let vals=gr.map(i=>b[i]).filter(Boolean);
+      if(rev)vals=vals.reverse();
+      const out=[];
+      for(let i=0;i<vals.length;i++){
+        if(vals[i]===vals[i+1]){out.push(vals[i]*2);score+=vals[i]*2;i++;}
+        else out.push(vals[i]);
+      }
+      while(out.length<4)out.push(0);
+      if(rev)out.reverse();
+      gr.forEach((idx,i)=>b[idx]=out[i]);
+    });
+    if(b.join(',')!==before){add();draw();if(!canMove())showGameOver('Score '+score);}
+  }
+  const key=e=>{
+    const m={ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right',ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down'};
+    if(m[e.key]){e.preventDefault();move(m[e.key]);}
+  };
+  let tx=0,ty=0;
+  const ts=e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;};
+  const te=e=>{
+    const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<24)return;
+    move(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'));
+  };
+  document.addEventListener('keydown',key);
+  grid.addEventListener('touchstart',ts,{passive:true});
+  grid.addEventListener('touchend',te,{passive:true});
+  GAME_CLEANUP=()=>{document.removeEventListener('keydown',key);};
+  gameHelp('Use the arrow keys, WASD, or swipe on the board. Matching numbers merge — reach 2048!');
+  add();add();draw();
+}
+function gameSnake(stage){
+  const W=400,H=400,C=20,N=W/C;
+  stage.innerHTML='<div class="game-wrap"><canvas id="gCanvas" width="'+W+'" height="'+H+'"></canvas></div>';
+  const cv=stage.querySelector('#gCanvas'),ctx=cv.getContext('2d');
+  let snake=[{x:9,y:10},{x:8,y:10},{x:7,y:10}],dir={x:1,y:0},next={x:1,y:0},food={x:15,y:10},score=0,timer=null,dead=false;
+  function place(){do{food={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N)}}while(snake.some(s=>s.x===food.x&&s.y===food.y));}
+  function draw(){
+    ctx.fillStyle='#181818';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,.045)';ctx.lineWidth=1;
+    for(let i=1;i<N;i++){
+      ctx.beginPath();ctx.moveTo(i*C,0);ctx.lineTo(i*C,H);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,i*C);ctx.lineTo(W,i*C);ctx.stroke();
+    }
+    ctx.fillStyle='#e74c3c';
+    ctx.beginPath();ctx.arc(food.x*C+C/2,food.y*C+C/2,C/2-2,0,Math.PI*2);ctx.fill();
+    snake.forEach((s,i)=>{
+      ctx.fillStyle=i===0?'#aed581':'#7cb342';
+      if(ctx.roundRect){ctx.beginPath();ctx.roundRect(s.x*C+1,s.y*C+1,C-2,C-2,4);ctx.fill();}
+      else ctx.fillRect(s.x*C+1,s.y*C+1,C-2,C-2);
+    });
+  }
+  function step(){
+    if(dead)return;
+    dir=next;
+    const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+    if(h.x<0||h.y<0||h.x>=N||h.y>=N||snake.slice(0,-1).some(s=>s.x===h.x&&s.y===h.y)){
+      dead=true;clearInterval(timer);showGameOver('You scored '+score);return;
+    }
+    snake.unshift(h);
+    if(h.x===food.x&&h.y===food.y){
+      score++;setGameScore(score);
+      if(score>getBest('snake')){setBest('snake',score);setGameBest(score);}
+      place();
+    }else snake.pop();
+    draw();
+  }
+  const key=e=>{
+    const m={ArrowUp:{x:0,y:-1},w:{x:0,y:-1},W:{x:0,y:-1},ArrowDown:{x:0,y:1},s:{x:0,y:1},S:{x:0,y:1},
+             ArrowLeft:{x:-1,y:0},a:{x:-1,y:0},A:{x:-1,y:0},ArrowRight:{x:1,y:0},d:{x:1,y:0},D:{x:1,y:0}};
+    if(m[e.key]){e.preventDefault();const d=m[e.key];if(d.x!==-dir.x||d.y!==-dir.y)next=d;}
+  };
+  document.addEventListener('keydown',key);
+  timer=setInterval(step,130);
+  gameHelp('Use the arrow keys or WASD to steer. Eat the red food to grow — don\'t hit the walls or your own tail.');
+  draw();
+  GAME_CLEANUP=()=>{clearInterval(timer);document.removeEventListener('keydown',key);};
+}
+function gameMemory(stage){
+  const syms=['🍎','🍌','🍇','🍓','🍒','🥝','🍍','🥑'];
+  const deck=syms.concat(syms).sort(()=>Math.random()-.5);
+  let open=[],matched=0,moves=0,lock=false;
+  stage.innerHTML='<div class="mem-grid" id="memGrid">'+deck.map((s,i)=>'<div class="mem-card" data-i="'+i+'"><span>'+s+'</span></div>').join('')+'</div>';
+  stage.querySelector('#memGrid').addEventListener('click',e=>{
+    const c=e.target.closest('.mem-card');
+    if(!c||lock||c.classList.contains('flip')||c.classList.contains('matched'))return;
+    c.classList.add('flip');open.push(c);
+    if(open.length===2){
+      moves++;setGameScore(moves);lock=true;
+      const a=open[0],b=open[1];
+      if(a.querySelector('span').textContent===b.querySelector('span').textContent){
+        setTimeout(()=>{
+          a.classList.add('matched');b.classList.add('matched');open=[];lock=false;matched++;
+          if(matched===8){setBest('memory',moves);setGameBest(moves);showGameOver('Completed in '+moves+' flips!');}
+        },420);
+      }else{
+        setTimeout(()=>{a.classList.remove('flip');b.classList.remove('flip');open=[];lock=false;},700);
+      }
+    }
+  });
+  gameHelp('Flip two cards at a time and remember what you see. Fewer flips is better — try to beat your best score!');
+  GAME_CLEANUP=()=>{};
+}
+function gameMole(stage){
+  stage.innerHTML='<div class="mole-grid" id="moleGrid">'+Array(9).fill(0).map(()=>'<div class="hole"><div class="mole">🐹</div></div>').join('')+'</div>';
+  const holes=[].map.call(stage.querySelectorAll('.mole'),m=>m);
+  let score=0,time=30,idx=-1,pop=null,tick=null;
+  function up(){
+    holes.forEach(m=>m.classList.remove('up','hit'));
+    idx=Math.floor(Math.random()*9);
+    holes[idx].classList.add('up');
+    pop=setTimeout(up,800);
+  }
+  stage.querySelector('#moleGrid').addEventListener('click',e=>{
+    const m=e.target.closest('.mole');
+    if(!m||!m.classList.contains('up'))return;
+    m.classList.add('hit');score++;setGameScore(score);
+    if(score>getBest('mole')){setBest('mole',score);setGameBest(score);}
+    clearTimeout(pop);
+    setTimeout(()=>{m.classList.remove('up','hit');up();},180);
+  });
+  tick=setInterval(()=>{
+    time--;
+    if(time<=0){
+      clearInterval(tick);clearTimeout(pop);
+      holes.forEach(m=>m.classList.remove('up','hit'));
+      showGameOver('You whacked '+score+' moles!');
+    }
+  },1000);
+  gameHelp('Tap the hamster whenever it pops up. You have 30 seconds — how many can you whack?');
+  up();
+  GAME_CLEANUP=()=>{clearInterval(tick);clearTimeout(pop);};
+}
+function gameBreaker(stage){
+  const W=360,H=400;
+  stage.innerHTML='<div class="game-wrap"><canvas id="gCanvas" width="'+W+'" height="'+H+'"></canvas></div>';
+  const cv=stage.querySelector('#gCanvas'),ctx=cv.getContext('2d');
+  const pw=72,ph=10,cols=8,rows=5,bw=38,bh=16,gap=5;
+  let px=(W-pw)/2,ball={x:W/2,y:H-45,r:6,dx:2.6,dy:-2.8},bricks=[],score=0,lives=3,raf=null,over=false;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)bricks.push({x:12+c*(bw+gap),y:36+r*(bh+gap),on:true,color:'hsl('+(r*54)+' 80% 55%)'});
+  function draw(){
+    ctx.fillStyle='#181818';ctx.fillRect(0,0,W,H);
+    bricks.forEach(b=>{if(b.on){ctx.fillStyle=b.color;ctx.fillRect(b.x,b.y,bw,bh);}});
+    ctx.fillStyle='#e0e0e0';ctx.fillRect(px,H-18,pw,ph);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#bbb';ctx.font='12px sans-serif';ctx.fillText('Lives: '+lives,12,20);
+  }
+  function loop(){
+    if(over)return;
+    ball.x+=ball.dx;ball.y+=ball.dy;
+    if(ball.x<ball.r||ball.x>W-ball.r)ball.dx*=-1;
+    if(ball.y<ball.r)ball.dy*=-1;
+    if(ball.y>H){
+      lives--;
+      if(lives<=0){over=true;showGameOver('Final score '+score);draw();return;}
+      ball={x:W/2,y:H-45,r:6,dx:2.6,dy:-2.8};px=(W-pw)/2;
+    }
+    if(ball.y+ball.r>=H-18&&ball.y<H-8&&ball.x>=px&&ball.x<=px+pw&&ball.dy>0){
+      ball.dy*=-1;
+      ball.dx=(ball.x-(px+pw/2))/(pw/2)*3;
+    }
+    bricks.forEach(b=>{
+      if(!b.on)return;
+      if(ball.x+ball.r>b.x&&ball.x-ball.r<b.x+bw&&ball.y+ball.r>b.y&&ball.y-ball.r<b.y+bh){
+        b.on=false;ball.dy*=-1;score++;setGameScore(score);
+        if(score>getBest('breaker')){setBest('breaker',score);setGameBest(score);}
+        if(bricks.every(x=>!x.on)){over=true;showGameOver('You cleared the wall!');}
+      }
+    });
+    draw();
+    if(!over)raf=requestAnimationFrame(loop);
+  }
+  const move=e=>{
+    const r=cv.getBoundingClientRect();
+    px=Math.max(0,Math.min(W-pw,(e.clientX-r.left)*(W/r.width)-pw/2));
+  };
+  const key=e=>{
+    if(e.key==='ArrowLeft'){e.preventDefault();px=Math.max(0,px-24);}
+    if(e.key==='ArrowRight'){e.preventDefault();px=Math.min(W-pw,px+24);}
+  };
+  cv.addEventListener('mousemove',move);
+  cv.addEventListener('touchmove',e=>{e.preventDefault();move(e.touches[0]);},{passive:false});
+  document.addEventListener('keydown',key);
+  gameHelp('Move your mouse or use the arrow keys to slide the paddle. Keep the ball alive and break every brick!');
+  loop();
+  GAME_CLEANUP=()=>{if(raf)cancelAnimationFrame(raf);document.removeEventListener('keydown',key);};
+}
+function renderGame(g){
+  cleanupGame();
+  playablesView.innerHTML=gameShell(g);
+  setGameScore(0);
+  setGameBest(getBest(g.id));
+  ({'2048':game2048,snake:gameSnake,memory:gameMemory,mole:gameMole,breaker:gameBreaker})[g.id]($('gameStage'));
+}
+function showPlayables(id){
+  cleanupGame();
+  const raw=id?String(id):'';
+  const official=raw.indexOf('official:')===0;
+  const g=(!official&&raw)?GAMES.find(x=>x.id===raw):null;
+  S.view=official?'official':(raw?'game':'playables');
+  browseView.hidden=true;watchView.hidden=true;shortsView.hidden=true;channelView.hidden=true;playablesView.hidden=false;
+  const og=official?OFFICIAL_GAMES.find(x=>x.id===raw.slice(9)):null;
+  document.title=(og?og.t+' - ':g?g.title+' - ':'')+'Playables - YouTube';
+  if(isMobile()) setNav('hidden');
+  window.scrollTo(0,0);
+  if(official) renderOfficialDetail(raw.slice(9));
+  else if(g) renderGame(g);
+  else renderPlayables();
+}
+function openPlayables(){
+  if(location.hash==='#playables'){showPlayables();return;}
+  history.pushState(null,'','#playables');
+  showPlayables();
+}
+function openGame(id){
+  const h='#playables='+encodeURIComponent(id);
+  if(location.hash===h){showPlayables(id);return;}
+  history.pushState(null,'',h);
+  showPlayables(id);
+}
+function openOfficialGame(id){
+  const key='official:'+id;
+  const h='#playables='+encodeURIComponent(key);
+  if(location.hash===h){showPlayables(key);return;}
+  history.pushState(null,'',h);
+  showPlayables(key);
+}
+playablesView.addEventListener('click',e=>{
+  if(e.target.closest('#playBack')||e.target.closest('#gameBack')||e.target.closest('#gameHome')){openPlayables();return;}
+  if(e.target.closest('#gameRestart')||e.target.closest('#gameAgain')){
+    const id=(location.hash.match(/^#playables=(.+)$/)||[])[1];
+    const g=id?GAMES.find(x=>x.id===decodeURIComponent(id)):null;
+    if(g) renderGame(g);
+    return;
+  }
+  const chip=e.target.closest('.off-chip');
+  if(chip){
+    S.offFilter=chip.dataset.genre||'All';S.offQuery='';
+    renderPlayables();
+    return;
+  }
+  const off=e.target.closest('[data-official]');
+  if(off){openOfficialGame(off.dataset.official);return;}
+  const card=e.target.closest('[data-game]');
+  if(card) openGame(card.dataset.game);
+});
+playablesView.addEventListener('input',e=>{
+  if(e.target.id!=='offSearch') return;
+  S.offQuery=e.target.value;
+  const grid=$('officialGrid');
+  if(grid) grid.innerHTML=officialCards();
+  const count=$('officialCount');
+  if(count) count.textContent=officialCountText(officialList().length);
+  document.querySelectorAll('.off-chip').forEach(c=>c.classList.toggle('active',(c.dataset.genre||'All')===S.offFilter));
+});
+/*=========================== routing ===========================*/
+function showBrowse(){
+  cleanupGame();
+  watchView.hidden=true;
+  shortsView.hidden=true;
+  channelView.hidden=true;
+  playablesView.hidden=true;
+  browseView.hidden=false;
+  S.view='browse';
+  S.current=null;
+  document.title='YouTube';
+  window.scrollTo(0,0);
+}
+function goHome(push){
+  if(push!==false) history.pushState(null,'',location.pathname+location.search);
+  if(isMobile()) setNav('hidden');
+  showBrowse();
+}
+function openVideo(id){
+  const h='#watch='+encodeURIComponent(id);
+  if(isMobile()) setNav('hidden');
+  if(location.hash===h){renderWatch(id);return;}
+  history.pushState(null,'',h);
+  renderWatch(id);
+}
+function openShorts(){
+  if(isMobile()) setNav('hidden');
+  if(location.hash==='#shorts'){showShorts();return;}
+  history.pushState(null,'','#shorts');
+  showShorts();
+}
+function route(){
+  const w=location.hash.match(/^#watch=(.+)$/);
+  if(w){renderWatch(decodeURIComponent(w[1]));return;}
+  const sh=location.hash.match(/^#shorts(?:=(.+))?$/);
+  if(sh){showShorts(sh[1]?decodeURIComponent(sh[1]):null);return;}
+  const c=location.hash.match(/^#channel=(.+)$/);
+  if(c){showChannel(decodeURIComponent(c[1]));return;}
+  const p=location.hash.match(/^#playables(?:=(.+))?$/);
+  if(p){showPlayables(p[1]?decodeURIComponent(p[1]):null);return;}
+  showBrowse();
+}
+/*=========================== navigation ===========================*/
+const isMobile=()=>window.innerWidth<792;
+function setNav(n){
+  document.body.dataset.nav=n;
+  document.body.classList.toggle('drawer',n==='full'&&isMobile());
+}
+function defaultNav(){
+  return window.innerWidth>=1312?'full':window.innerWidth>=792?'mini':'hidden';
+}
+function searchFor(q){
+  $('searchInput').value=q;
+  if(location.hash) goHome();
+  loadFeed(q);
+  renderChips();
+}
+/*=========================== theme / menu ===========================*/
+function setTheme(t){
+  document.body.dataset.theme=t;
+  try{localStorage.setItem('yt-theme',t);}catch(e){}
+  const item=$('themeItem');
+  if(item) item.textContent='Appearance: '+(t==='dark'?'Dark':'Light');
+}
+const menu=$('accountMenu');
+function closeMenu(){menu.hidden=true;}
+/*=========================== events ===========================*/
+$('menuBtn').addEventListener('click',()=>{
+  if(isMobile()) setNav(document.body.dataset.nav==='full'?'hidden':'full');
+  else{S.navPinned=true;setNav(document.body.dataset.nav==='full'?'mini':'full');}
+});
+$('scrim').addEventListener('click',()=>setNav('hidden'));
+$('logoLink').addEventListener('click',e=>{e.preventDefault();goHome();});
+$('searchForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const q=$('searchInput').value.trim();
+  if(!q){$('searchInput').focus();return;}
+  if(location.hash) goHome();
+  loadFeed(q);
+  renderChips();
+});
+$('micBtn').addEventListener('click',()=>toast('Voice search is not available in this recreation'));
+$('createBtn').addEventListener('click',()=>toast('Upload is not available in this recreation'));
+$('bellBtn').addEventListener('click',()=>toast('You have no new notifications'));
+$('avatarBtn').addEventListener('click',e=>{e.stopPropagation();menu.hidden=!menu.hidden;});
+document.addEventListener('click',e=>{
+  if(menu.hidden) return;
+  if(e.target.closest('#accountMenu')||e.target.closest('#avatarBtn')) return;
+  closeMenu();
+});
+menu.addEventListener('click',e=>{
+  const b=e.target.closest('.menu-item');
+  if(!b||!b.dataset.act) return;
+  const a=b.dataset.act;
+  if(a==='theme') setTheme(document.body.dataset.theme==='dark'?'light':'dark');
+  else if(a==='shortcuts') toast('Shortcuts: “/” search — “Esc” close — “←” back');
+  else if(a==='signout') toast('Signed out (demo only)');
+  else toast('“'+b.textContent.trim()+'” is not available in this recreation');
+  if(a!=='theme') closeMenu();
+});
+chipsEl.addEventListener('click',e=>{
+  const c=e.target.closest('.chip');
+  if(!c) return;
+  const q=c.dataset.chip==='All'?'':c.dataset.chip.toLowerCase();
+  if(q===S.query&&!S.loading) return;
+  if(location.hash) goHome();
+  loadFeed(q);
+  renderChips();
+});
+sidebar.addEventListener('click',e=>{
+  const b=e.target.closest('[data-nav],[data-channel]');
+  if(!b) return;
+  if(isMobile()) setNav('hidden');
+  if(b.dataset.channel){openChannel(b.dataset.cid,b.dataset.channel);return;}
+  const k=b.dataset.nav;
+  if(k==='home'){goHome();return;}
+  if(k==='shorts'){openShorts();return;}
+  if(k==='playables'){openPlayables();return;}
+  const q={subs:'wwe',trending:'trending',music:'music',gaming:'gaming',news:'news',sport:'sports'}[k];
+  if(q){searchFor(q);return;}
+  toast('“'+b.textContent.trim()+'” is not available in this recreation');
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-cid],[data-cname]')) return;
+  const el=e.target.closest('.card[data-id],.compact[data-id]');
+  if(!el) return;
+  openVideo(el.dataset.id);
+});
+document.addEventListener('keydown',e=>{
+  const a=document.activeElement;
+  if(e.key==='Escape'){
+    if(menu.hidden===false){closeMenu();return;}
+    if(S.view==='game'||S.view==='official'){e.preventDefault();openPlayables();return;}
+    if(S.view==='playables'){e.preventDefault();goHome();return;}
+    if(isMobile()&&document.body.dataset.nav==='full') setNav('hidden');
+  }
+  if(e.key==='/'&&a&&a.tagName!=='INPUT'&&a.tagName!=='TEXTAREA'){
+    e.preventDefault();$('searchInput').focus();$('searchInput').select();
+  }
+  if(S.view==='shorts'&&a&&a.tagName!=='INPUT'){
+    if(e.key==='ArrowDown'){e.preventDefault();scrollShort(1);return;}
+    if(e.key==='ArrowUp'){e.preventDefault();scrollShort(-1);return;}
+    if(e.key==='Escape'){goHome();return;}
+  }
+  if(e.key==='Enter'&&a&&a.dataset&&a.dataset.id) openVideo(a.dataset.id);
+});
+window.addEventListener('scroll',()=>{
+  if(browseView.hidden||S.loading||!S.cursor) return;
+  if(window.innerHeight+window.scrollY>=document.body.offsetHeight-1200) loadFeed(S.query,true);
+},{passive:true});
+let rz;
+window.addEventListener('resize',()=>{
+  clearTimeout(rz);
+  rz=setTimeout(()=>{
+    if(!S.navPinned) setNav(defaultNav());
+    else document.body.classList.toggle('drawer',document.body.dataset.nav==='full'&&isMobile());
+  },120);
+});
+window.addEventListener('popstate',route);
+window.addEventListener('hashchange',route);
+/*=========================== init ===========================*/
+(function init(){
+  let theme='dark';
+  try{theme=localStorage.getItem('yt-theme')||'dark';}catch(e){}
+  setTheme(theme);
+  setNav(defaultNav());
+  renderSidebar();
+  renderChips();
+  renderSkeletons();
+  setStatus();
+  S.items=SEED.map(v=>Object.assign({},v));
+  buildSubscriptions();
+  route();
+  loadFeed('',false,true).then(()=>{if(/^#watch=/.test(location.hash)) route();});
+})();
+})();
+</script>
+</body>
+</html>
